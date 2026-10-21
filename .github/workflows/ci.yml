@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - name: Install (without the model: tests do not download TimesFM)
+      - name: Install dependencies (no model download is needed for the tests)
         run: pip install -e ".[dev]"
       - name: Lint
         run: ruff check .
