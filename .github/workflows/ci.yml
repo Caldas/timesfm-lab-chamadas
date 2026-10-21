@@ -48,6 +48,28 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Run setup script
         run: ${{ matrix.cmd }}
+      - name: Run setup script again (must reuse everything and install nothing)
+        shell: bash
+        run: |
+          ${{ matrix.cmd }} 2>&1 | tee second-run.log
+          grep -Eq "REUSO\] Depend" second-run.log
+          if grep -Eq "Instalando as depend" second-run.log; then
+            echo "A segunda execução reinstalou dependências, mas deveria reaproveitar tudo."
+            exit 1
+          fi
+
+  setup-bare-ubuntu:
+    # A fresh Ubuntu with no Python at all: the script must offer/perform the apt install itself.
+    name: Setup script (bare Ubuntu, no Python)
+    runs-on: ubuntu-latest
+    container: ubuntu:24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm there is no Python
+        run: '! command -v python3'
+      - name: Run setup script with --yes (installs Python via apt)
+        run: bash ./scripts/setup_linux.sh --yes
 
   model-smoke-test:
     # Manual only: downloads the TimesFM 3.0 weights and runs one real forecast on each OS.

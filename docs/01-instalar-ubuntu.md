@@ -17,16 +17,21 @@ Aperte `Ctrl + Alt + T`.
 
 ## Passo 2 — Instalar as ferramentas básicas
 
+Você precisa do **Git** para baixar o projeto. O Python é opcional neste passo: o script de
+instalação (Passo 4) confere se o Python e o módulo `venv` já existem e, se faltarem, **oferece
+instalá-los com `apt`**.
+
 ```bash
 sudo apt update
-sudo apt install -y git python3 python3-venv python3-pip
+sudo apt install -y git
 ```
 
-O pacote `python3-venv` é importante: no Ubuntu ele vem separado do Python. Sem ele, a instalação
-falha ao criar o ambiente. Confira a versão (precisa ser 3.10 ou mais nova):
+Se preferir instalar tudo agora (o `python3-venv` vem separado do Python no Ubuntu; sem ele não dá
+para criar o ambiente):
 
 ```bash
-python3 --version
+sudo apt install -y git python3 python3-venv python3-pip
+python3 --version      # precisa ser 3.10 ou mais nova
 ```
 
 ## Passo 3 — Baixar o projeto
@@ -53,6 +58,10 @@ Se tiver placa **NVIDIA** com driver funcionando (`nvidia-smi` mostra a placa), 
 ```
 
 Esse modo baixa o PyTorch com CUDA, que é bem maior (cerca de 3 GB).
+
+O script verifica o que já existe (Python, `.venv`, PyTorch e bibliotecas) e instala só o que falta.
+Se faltar o Python, ele pergunta antes de rodar o `apt` (use `--yes` para responder "sim"
+automaticamente). Para refazer tudo do zero, use `--reinstalar`.
 
 Se aparecer "permission denied": `chmod +x scripts/*.sh` e tente de novo.
 

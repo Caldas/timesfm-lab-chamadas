@@ -14,10 +14,29 @@ Para saber qual Mac você tem: menu  → **Sobre Este Mac**.
 
 ## O que os scripts fazem (todos)
 
-1. Procuram um Python compatível.
-2. Criam um ambiente isolado na pasta `.venv` (não mexem no resto do computador).
-3. Instalam as bibliotecas certas para o seu sistema.
-4. Rodam `scripts/verificar_ambiente.py` para conferir se está tudo certo.
+Os scripts **primeiro verificam o que já existe** e só instalam o que falta. Podem ser rodados quantas
+vezes quiser (por exemplo, depois de um `git pull`): numa segunda execução, com tudo já instalado,
+terminam em segundos sem baixar nada.
+
+1. **Python:** procuram um Python compatível. Se já existe, usam. Se não existe, **perguntam se podem
+   instalá-lo** (Homebrew no Mac, `apt` no Ubuntu, `winget` no Windows). Se você responder não, mostram
+   o comando para você instalar.
+2. **Ambiente isolado (`.venv`):** se a pasta já existe e é compatível, reaproveitam; senão, criam.
+   Não mexem no resto do computador.
+3. **Bibliotecas:** conferem o que já está instalado e baixam só o que falta (no Ubuntu isso inclui o
+   PyTorch, só-CPU ou com GPU).
+4. **Verificação:** rodam `scripts/verificar_ambiente.py` para conferir se está tudo certo.
+
+Opções dos scripts:
+
+| Opção | Mac e Ubuntu | Windows | Para que serve |
+|---|---|---|---|
+| Responder "sim" às perguntas | `--yes` | `-Yes` | Instalar o Python sem perguntar (ou em modo automático) |
+| Refazer tudo do zero | `--reinstalar` | `-Reinstalar` | Recriar o `.venv` e reinstalar tudo, se o ambiente estiver estragado |
+| GPU NVIDIA | `--gpu` (só Ubuntu) | | PyTorch com CUDA |
+
+Sem perguntas possíveis (por exemplo, rodando num servidor sem teclado) e sem `--yes`/`-Yes`, os
+scripts não instalam nada do sistema: só mostram o que fazer.
 
 Depois da instalação, o uso é igual nos quatro sistemas: **abrir a interface**, escolher um CSV e
 prever. Veja [04-usando-a-interface.md](04-usando-a-interface.md).

@@ -1,12 +1,28 @@
 #!/usr/bin/env bash
 # Instala o laboratório no Mac (Apple silicon ou Intel).
-# Rode na raiz do repositório: ./scripts/setup_mac.sh
+# Detecta o que já existe (Python, .venv, bibliotecas) e instala só o que falta.
+#
+# Uso (na raiz do repositório):
+#   ./scripts/setup_mac.sh                # normal
+#   ./scripts/setup_mac.sh --yes          # responde "sim" às perguntas (instalar Python via Homebrew)
+#   ./scripts/setup_mac.sh --reinstalar   # recria o .venv e reinstala tudo
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+ASSUME_YES=0
+FORCE=0
+for arg in "$@"; do
+  case "$arg" in
+    -y|--yes) ASSUME_YES=1 ;;
+    --reinstalar) FORCE=1 ;;
+    -h|--help) sed -n '2,9p' "$0"; exit 0 ;;
+    *) echo "[ERRO] Opção desconhecida: $arg"; exit 1 ;;
+  esac
+done
+
 if [[ "$(uname -s)" != "Darwin" ]]; then
-  echo "❌ Este script é para macOS. Veja docs/01-instalar-mac.md"
+  echo "[ERRO] Este script é para macOS. Veja docs/01-instalar.md"
   exit 1
 fi
 
@@ -14,64 +30,110 @@ ARCH="$(uname -m)"
 
 # Terminal aberto em modo Rosetta num Mac Apple silicon aparece como x86_64 e instalaria a versão lenta.
 if [[ "$ARCH" == "x86_64" && "$(sysctl -in sysctl.proc_translated 2>/dev/null || echo 0)" == "1" ]]; then
-  echo "❌ Este Terminal está rodando em modo Rosetta (emulando Intel) num Mac Apple silicon."
-  echo "   Rode: arch -arm64 ./scripts/setup_mac.sh   (veja docs/06-problemas-comuns.md)"
+  echo "[ERRO] Este Terminal está rodando em modo Rosetta (emulando Intel) num Mac Apple silicon."
+  echo "       Rode: arch -arm64 ./scripts/setup_mac.sh   (veja docs/06-problemas-comuns.md)"
   exit 1
 fi
 
-# No Intel, o PyTorch só existe até a versão 2.2.2, que só suporta Python 3.10 a 3.12.
-pick_python() {
-  if [[ -n "${PYTHON:-}" ]]; then
-    echo "$PYTHON"
-  elif [[ "$ARCH" == "arm64" ]]; then
-    echo "python3"
-  else
-    for candidate in python3.12 python3.11 python3.10; do
-      if command -v "$candidate" >/dev/null 2>&1; then
-        echo "$candidate"
-        return
-      fi
-    done
-    echo "python3"
-  fi
+# Python aceito: 3.10+; no Intel o PyTorch só existe até a 2.2.2 (Python 3.10 a 3.12);
+# no Apple silicon o Python precisa ser nativo (arm64) para usar o MLX.
+if [[ "$ARCH" == "arm64" ]]; then
+  PYCHECK='import sys, platform; sys.exit(0 if sys.version_info >= (3, 10) and platform.machine() == "arm64" else 1)'
+  REQ="requirements/mac.txt"
+  CANDIDATES=(python3 python3.12 python3.13 python3.11 python3.10)
+else
+  PYCHECK='import sys; sys.exit(0 if (3, 10) <= sys.version_info[:2] <= (3, 12) else 1)'
+  REQ="requirements/mac-intel.txt"
+  CANDIDATES=(python3.12 python3.11 python3.10 python3)
+fi
+
+confirm() {
+  [[ "$ASSUME_YES" == "1" ]] && return 0
+  [[ -t 0 ]] || return 1
+  local answer
+  read -r -p "$1 [s/N] " answer
+  [[ "$answer" =~ ^[sSyY] ]]
 }
 
-PY="$(pick_python)"
-if ! command -v "$PY" >/dev/null 2>&1; then
-  echo "❌ Python não encontrado. Instale com: brew install python@3.12 (veja docs/01-instalar-mac.md)"
-  exit 1
-fi
-if ! "$PY" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)'; then
-  echo "❌ Precisa de Python 3.10 ou mais novo. Versão atual: $("$PY" --version)"
-  exit 1
-fi
+python_ok() {
+  command -v "$1" >/dev/null 2>&1 && "$1" -c "$PYCHECK" >/dev/null 2>&1
+}
 
-if [[ "$ARCH" == "arm64" ]]; then
-  REQ="requirements/mac.txt"
-  echo "ℹ️  Apple silicon detectado: usando o motor MLX."
-else
-  REQ="requirements/mac-intel.txt"
-  echo "ℹ️  Mac Intel detectado: usando PyTorch em CPU (mais lento)."
-  if ! "$PY" -c 'import sys; sys.exit(0 if sys.version_info < (3, 13) else 1)'; then
-    echo "❌ No Mac Intel é preciso Python 3.10, 3.11 ou 3.12 (o seu é $("$PY" --version))."
-    echo "   Rode: brew install python@3.12 && PYTHON=python3.12 ./scripts/setup_mac.sh"
-    exit 1
+find_python() {
+  if [[ -n "${PYTHON:-}" ]]; then
+    python_ok "$PYTHON" && echo "$PYTHON"
+    return 0
+  fi
+  local candidate brew_py
+  for candidate in "${CANDIDATES[@]}"; do
+    if python_ok "$candidate"; then echo "$candidate"; return 0; fi
+  done
+  if command -v brew >/dev/null 2>&1; then
+    brew_py="$(brew --prefix 2>/dev/null)/bin/python3.12"
+    if python_ok "$brew_py"; then echo "$brew_py"; return 0; fi
+  fi
+  return 0
+}
+
+deps_missing() {
+  # pip --dry-run lists "Would install ..." when anything is missing. Capture first: piping into
+  # `grep -q` can make pip die from SIGPIPE and fool `pipefail`.
+  local out
+  out="$("$VENV_PY" -m pip install --dry-run -r "$1" 2>&1)" || return 0
+  grep -q "^Would install" <<<"$out"
+}
+
+# --- 1. Python: usar o que já existe; se faltar, oferecer instalar ---
+PY="$(find_python)"
+if [[ -z "$PY" ]]; then
+  echo "[INFO] Nenhum Python compatível encontrado."
+  if command -v brew >/dev/null 2>&1 && confirm "Instalar o Python 3.12 com o Homebrew agora?"; then
+    brew install python@3.12
+    PY="$(find_python)"
   fi
 fi
-echo "ℹ️  Usando $("$PY" --version) ($PY)"
+if [[ -z "$PY" ]]; then
+  if [[ "$ARCH" == "arm64" ]]; then
+    echo "[ERRO] Precisa de Python 3.10 ou mais novo (nativo arm64)."
+  else
+    echo "[ERRO] No Mac Intel é preciso Python 3.10, 3.11 ou 3.12 (o PyTorch não existe para versões mais novas)."
+  fi
+  echo "       Instale com: brew install python@3.12   (Homebrew: https://brew.sh)"
+  echo "       Depois rode de novo: ./scripts/setup_mac.sh"
+  exit 1
+fi
+if [[ "$ARCH" == "arm64" ]]; then
+  echo "[OK] Python encontrado: $("$PY" --version) ($PY). Motor: MLX (Apple silicon)."
+else
+  echo "[OK] Python encontrado: $("$PY" --version) ($PY). Motor: PyTorch em CPU (Mac Intel, mais lento)."
+fi
 
-echo "➡️  Criando ambiente virtual em .venv ..."
-"$PY" -m venv .venv
-# shellcheck disable=SC1091
-source .venv/bin/activate
+# --- 2. Ambiente virtual: reaproveitar se estiver bom ---
+if [[ "$FORCE" == "0" && -x .venv/bin/python ]] && .venv/bin/python -c "$PYCHECK" >/dev/null 2>&1; then
+  echo "[REUSO] Ambiente .venv já existe e é compatível: reaproveitando."
+else
+  echo "[INFO] Criando ambiente virtual em .venv ..."
+  "$PY" -m venv --clear .venv
+fi
+VENV_PY=".venv/bin/python"
 
-echo "➡️  Instalando dependências (pode levar alguns minutos) ..."
-python -m pip install --upgrade pip
-python -m pip install -r "$REQ"
-python -m pip install -e . --no-deps
+# --- 3. Dependências: instalar só se algo estiver faltando ---
+if [[ "$FORCE" == "0" ]] && ! deps_missing "$REQ"; then
+  echo "[REUSO] Dependências já instaladas ($REQ): nada a baixar."
+else
+  echo "[INFO] Instalando as dependências que faltam (pode levar alguns minutos) ..."
+  "$VENV_PY" -m pip install --upgrade pip
+  "$VENV_PY" -m pip install -r "$REQ"
+fi
+if "$VENV_PY" -c "import trafego_lab" >/dev/null 2>&1; then
+  echo "[REUSO] Pacote trafego_lab já instalado."
+else
+  "$VENV_PY" -m pip install -e . --no-deps
+fi
 
-echo "➡️  Verificando o ambiente ..."
-python scripts/verificar_ambiente.py
+# --- 4. Conferir ---
+echo "[INFO] Verificando o ambiente ..."
+"$VENV_PY" scripts/verificar_ambiente.py
 
 cat <<MSG
 

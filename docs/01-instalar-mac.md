@@ -25,6 +25,9 @@ aqui parecer estranho, veja o [glossário](05-glossario-ti.md).
 ## Passo 2 — Instalar as ferramentas básicas
 
 Você precisa de **Homebrew** (instalador de programas), **Git** (baixa o projeto) e **Python**.
+O script de instalação (Passo 4) confere se o Python já existe e, se não existir e o Homebrew
+estiver instalado, **oferece instalá-lo**. Então, se preferir, pode pular a instalação do Python
+abaixo.
 
 1. Instale o Homebrew seguindo as instruções de <https://brew.sh> (um comando para colar no Terminal).
 2. Depois:
@@ -62,7 +65,9 @@ do GitHub quando o Git pedir.
 ./scripts/setup_mac.sh
 ```
 
-O script cria um ambiente isolado (`.venv`), instala as bibliotecas e confere se tudo está certo.
+O script verifica o que já existe (Python, `.venv`, bibliotecas) e instala só o que falta, cria um
+ambiente isolado (`.venv`) e confere se tudo está certo. Opções: `--yes` (responde "sim" às
+perguntas) e `--reinstalar` (refaz tudo do zero).
 Se aparecer "permission denied", rode `chmod +x scripts/setup_mac.sh` e tente de novo.
 
 No final você deve ver `✅ Tudo certo.`

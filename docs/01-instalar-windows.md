@@ -10,7 +10,10 @@ Windows 10 ou 11. Tempo estimado: 15 a 30 minutos.
 
 ## Passo 1 — Instalar o Python e o Git
 
-Há duas formas. Escolha uma.
+Você precisa do **Git** para baixar o projeto. O Python pode ser instalado agora ou depois: o script
+do Passo 3 procura um Python 3.10+ e, se não achar, **oferece instalá-lo com o `winget`**.
+
+Há duas formas de instalar agora. Escolha uma.
 
 **Forma A — pelo terminal (mais rápida).** Abra o menu Iniciar, digite **PowerShell** e Enter:
 
@@ -53,8 +56,10 @@ powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1
 ```
 
 O `-ExecutionPolicy Bypass` vale só para esse comando e evita o bloqueio de scripts do Windows.
-O script cria o ambiente (`.venv`), instala as bibliotecas e confere o resultado. No final você deve
-ver `Tudo certo` e `[OK] Pronto!`.
+O script verifica o que já existe (Python, `.venv`, bibliotecas) e instala só o que falta; se o
+Python não existir, ele pergunta antes de instalar (adicione `-Yes` ao final para responder "sim"
+automaticamente, ou `-Reinstalar` para refazer tudo do zero). No final você deve ver `Tudo certo` e
+`[OK] Pronto!`.
 
 ## Passo 4 — Testar o modelo (primeira vez)
 
