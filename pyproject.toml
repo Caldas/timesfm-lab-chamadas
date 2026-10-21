@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trafego-lab"
+version = "0.1.0"
+description = "Laboratório para estudar o TimesFM 3.0 com dados de tráfego"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["numpy>=1.26", "pandas>=2.0"]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.35", "plotly>=5.20"]
+mlx = ["timesfm[mlx]>=3.0.2"]
+torch = ["timesfm[torch]>=3.0.2"]
+kaggle = ["kaggle>=1.6"]
+notebooks = ["jupyterlab>=4.0", "matplotlib>=3.8"]
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "app", "scripts", "tests"]
