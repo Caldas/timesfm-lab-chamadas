@@ -38,14 +38,43 @@ source .venv/bin/activate     # o Terminal deve mostrar (.venv)
 
 ## O motor aparece como `torch` em vez de `mlx`
 
-O MLX só funciona em Mac com Apple silicon e com Python nativo (arm64). Confira:
+- **Mac Intel:** `torch` é o esperado (o MLX só existe para Apple silicon). Funciona, mas é mais lento.
+- **Mac Apple silicon:** o MLX só funciona com Python nativo (arm64). Confira:
 
 ```bash
 python -c "import platform; print(platform.machine())"
 ```
 
-Deve mostrar `arm64`. Se mostrar `x86_64`, seu Python roda em modo de compatibilidade: instale o do
-Homebrew (`brew install python@3.12`) e rode o setup de novo. Em Mac Intel o `torch` é o esperado.
+Deve mostrar `arm64`. Se mostrar `x86_64`, seu Terminal ou seu Python roda em modo de
+compatibilidade (Rosetta). Instale o Python do Homebrew (`brew install python@3.12`), abra um
+Terminal novo e rode o setup de novo; se precisar, force o modo nativo:
+
+```bash
+arch -arm64 ./scripts/setup_mac.sh
+```
+
+## Mac Intel: `Could not find a version that satisfies the requirement torch==2.2.2`
+
+Seu Python é novo demais (3.13 ou mais). No Mac Intel o PyTorch só existe para Python 3.10 a 3.12:
+
+```bash
+brew install python@3.12
+rm -rf .venv
+PYTHON=python3.12 ./scripts/setup_mac.sh
+```
+
+## Mac Intel: `A module that was compiled using NumPy 1.x cannot be run in NumPy 2`
+
+O NumPy ficou novo demais para o PyTorch 2.2. Com o ambiente ativo:
+
+```bash
+python -m pip install "numpy<2"
+```
+
+## Mac Intel: está muito lento
+
+É esperado: a CPU Intel é bem mais lenta que o chip Apple. Use históricos de 300 a 600 passos,
+horizontes menores, e evite rodar o teste de realidade com horizontes longos.
 
 ## O download do modelo falha ou fica parado
 

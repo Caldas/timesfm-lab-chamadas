@@ -127,7 +127,11 @@ c1.metric("Pontos", len(series))
 c2.metric("Início", f"{series.index[0]:%Y-%m-%d %H:%M}")
 c3.metric("Fim", f"{series.index[-1]:%Y-%m-%d %H:%M}")
 st.plotly_chart(plot_forecast(series), width="stretch")
-st.caption(f"Motor que será usado: **{choose_backend(backend)}**")
+chosen_backend = choose_backend(backend)
+st.caption(f"Motor que será usado: **{chosen_backend}**")
+if chosen_backend == "torch":
+    st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon. "
+            "Para acelerar, reduza o histórico e o número de passos na barra lateral.")
 
 tab_forecast, tab_backtest = st.tabs(["🔮 Previsão", "🧪 Teste de realidade"])
 

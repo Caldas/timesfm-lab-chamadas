@@ -35,6 +35,30 @@ def check_import(name: str, hint: str) -> bool:
     return True
 
 
+def check_torch() -> int:
+    """PyTorch checks, mainly for Intel Macs. Returns the number of problems found."""
+    try:
+        import numpy
+        import torch
+    except ImportError as exc:
+        print(f"{FAIL} torch: {exc}\n    -> rode ./scripts/setup_mac.sh de novo")
+        return 1
+
+    problems = 0
+    print(f"{OK} torch {torch.__version__} (CPU)")
+    if platform.system() == "Darwin" and platform.machine() == "x86_64":
+        if sys.version_info >= (3, 13):
+            print(f"{FAIL} Mac Intel precisa de Python 3.10 a 3.12 (este é {platform.python_version()})."
+                  "\n    -> veja docs/06-problemas-comuns.md")
+            problems += 1
+        if int(numpy.__version__.split(".")[0]) >= 2 and torch.__version__.startswith("2.2"):
+            print(f"{FAIL} NumPy {numpy.__version__} é incompatível com o PyTorch 2.2."
+                  "\n    -> rode: pip install 'numpy<2'")
+            problems += 1
+        print("ℹ️  Mac Intel: a previsão roda na CPU e é mais lenta. Use históricos e horizontes menores.")
+    return problems
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--com-modelo", action="store_true", help="carrega o modelo e prevê")
@@ -57,6 +81,8 @@ def main() -> int:
     print(f"ℹ️  Motor escolhido: {backend}")
     backend_module = "timesfm3.mlx" if backend == "mlx" else "timesfm3"
     problems += not check_import(backend_module, "veja docs/06-problemas-comuns.md")
+    if backend == "torch":
+        problems += check_torch()
 
     if args.com_modelo and not problems:
         from trafego_lab.amostra import make_synthetic_traffic

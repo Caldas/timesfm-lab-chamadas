@@ -34,8 +34,8 @@ python scripts/verificar_ambiente.py
 streamlit run app/app.py        # abre a interface
 ```
 
-> **Plataformas:** esta primeira fase cobre o **Mac** (Apple silicon com MLX; Intel com PyTorch em CPU).
-> O suporte ao Jetson Orin Nano fica para uma fase futura, depois de testado no aparelho.
+> **Plataformas:** Mac com **Apple silicon** (motor MLX, rápido) e Mac **Intel** (PyTorch em CPU, mais
+> lento; exige Python 3.10–3.12). O suporte ao Jetson Orin Nano fica para uma fase futura.
 
 ## Estrutura
 

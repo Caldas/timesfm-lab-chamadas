@@ -4,9 +4,11 @@ Tempo estimado: 15 a 30 minutos (a maior parte é download).
 
 ## O que você precisa
 
-- Um Mac. O ideal é **Apple silicon** (M1, M2, M3, M4): o TimesFM roda com o motor MLX, que é
-  otimizado para esses chips. Mac com processador Intel também funciona, só que mais lento.
-- macOS 14 ou mais novo (recomendado).
+- Um Mac. Os dois tipos funcionam:
+  - **Apple silicon** (M1, M2, M3, M4): o TimesFM roda com o motor MLX, otimizado para esses chips.
+  - **Intel**: roda com PyTorch na CPU, que é **bem mais lento** (veja a seção
+    [Mac Intel](#mac-intel) abaixo).
+- macOS 14 ou mais novo (recomendado para Apple silicon).
 - 8 GB de memória ou mais.
 - Uns 5 GB livres em disco.
 - Internet (a primeira execução baixa o modelo).
@@ -99,6 +101,31 @@ git pull
 source .venv/bin/activate
 python -m pip install -r requirements/mac.txt
 ```
+
+## Mac Intel
+
+O processo é o mesmo, com três diferenças:
+
+1. **Python 3.10, 3.11 ou 3.12** (não use o 3.13 ou mais novo). O PyTorch parou de publicar versões
+   para Mac Intel depois da 2.2.2, e essa versão não existe para Python mais novo. O `setup_mac.sh`
+   procura o Python certo sozinho; se não achar, instale e rode de novo:
+
+   ```bash
+   brew install python@3.12
+   PYTHON=python3.12 ./scripts/setup_mac.sh
+   ```
+
+2. **Mais lento.** O modelo roda na CPU. A primeira previsão leva mais tempo (carrega o modelo), e as seguintes
+   levam de alguns segundos a poucos minutos, dependendo do seu Mac. Na interface, reduza "Quanto histórico usar"
+   (por exemplo, 500) e "Quantos passos prever" para testar rápido.
+
+3. **Atualização de projeto:** use `requirements/mac-intel.txt` em vez de `mac.txt`:
+
+   ```bash
+   python -m pip install -r requirements/mac-intel.txt
+   ```
+
+Para conferir: `python scripts/verificar_ambiente.py` deve mostrar `Motor escolhido: torch`.
 
 ## Notebooks (opcional)
 

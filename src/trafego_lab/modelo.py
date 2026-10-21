@@ -55,6 +55,9 @@ def load_forecaster(backend: str = "auto", checkpoint: str = CHECKPOINT):
 
         return TimesFM3Forecaster.from_pretrained(checkpoint)
 
+    from .compat import ensure_rmsnorm
+
+    ensure_rmsnorm()  # Intel Macs only get PyTorch 2.2, which has no nn.RMSNorm
     from timesfm3 import TimesFM3Forecaster
 
     return TimesFM3Forecaster.from_pretrained(checkpoint, device="cpu")

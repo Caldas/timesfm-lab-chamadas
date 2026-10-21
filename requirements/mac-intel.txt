@@ -1,5 +1,9 @@
-# Mac com processador Intel: PyTorch em CPU (mais lento)
+# Mac com processador Intel: PyTorch em CPU (mais lento que o Apple silicon).
+# O PyTorch parou de publicar versões para Mac Intel depois da 2.2.2, que só existe para
+# Python 3.9 a 3.12 e exige NumPy 1.x. Por isso os limites abaixo.
 -r comum.txt
+numpy>=1.26,<2
+torch==2.2.2
 timesfm[torch]>=3.0.2
 jupyterlab>=4.0
 matplotlib>=3.8
