@@ -44,6 +44,13 @@ Resumo rápido (depois de ler o guia do seu sistema):
 >
 > O suporte ao Jetson Orin Nano fica para uma fase futura.
 
+## O que é testado automaticamente
+
+A cada alteração, o CI (GitHub Actions) roda os testes e o **script de instalação real** em Ubuntu,
+Windows, Mac Apple silicon e Mac Intel. O job manual "Real forecast" também baixa o modelo e gera
+uma previsão nos quatro sistemas. O que **não** é testado automaticamente: uso de GPU NVIDIA (`--gpu`),
+Windows ARM64 e Linux ARM.
+
 ## Estrutura
 
 ```
