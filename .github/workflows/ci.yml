@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:   # lets you run the model smoke test by hand (Actions tab -> Run workflow)
 
 jobs:
   test:
@@ -47,3 +48,27 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Run setup script
         run: ${{ matrix.cmd }}
+
+  model-smoke-test:
+    # Manual only: downloads the TimesFM 3.0 weights and runs one real forecast on each OS.
+    if: github.event_name == 'workflow_dispatch'
+    name: Real forecast (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: "Ubuntu", os: ubuntu-latest, cmd: "./scripts/setup_linux.sh", venv_python: ".venv/bin/python" }
+          - { label: "Windows", os: windows-latest, cmd: "powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1", venv_python: ".venv\\Scripts\\python.exe" }
+          - { label: "Mac Apple silicon", os: macos-latest, cmd: "./scripts/setup_mac.sh", venv_python: ".venv/bin/python" }
+          - { label: "Mac Intel", os: macos-15-intel, cmd: "./scripts/setup_mac.sh", venv_python: ".venv/bin/python" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run setup script
+        run: ${{ matrix.cmd }}
+      - name: Load the model and forecast
+        run: ${{ matrix.venv_python }} scripts/verificar_ambiente.py --com-modelo
