@@ -1,5 +1,7 @@
 # 01 — Instalar no Mac
 
+> Usa Ubuntu ou Windows? Veja o [índice de instalação](01-instalar.md).
+
 Tempo estimado: 15 a 30 minutos (a maior parte é download).
 
 ## O que você precisa
@@ -78,8 +80,7 @@ Mac. Se aparecer `✅ Previsão de 24 passos gerada`, está tudo funcionando.
 ## Passo 6 — Abrir a interface
 
 ```bash
-source .venv/bin/activate
-streamlit run app/app.py
+./scripts/abrir_interface.sh
 ```
 
 O navegador abre sozinho em `http://localhost:8501`. Para fechar, volte ao Terminal e aperte
@@ -87,11 +88,10 @@ O navegador abre sozinho em `http://localhost:8501`. Para fechar, volte ao Termi
 
 ## Nas próximas vezes
 
-Só dois comandos, dentro da pasta do projeto:
+Um comando, dentro da pasta do projeto:
 
 ```bash
-source .venv/bin/activate
-streamlit run app/app.py
+./scripts/abrir_interface.sh
 ```
 
 ## Atualizar o projeto

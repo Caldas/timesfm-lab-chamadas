@@ -1,6 +1,11 @@
 # 04 — Usando a interface
 
-Abra com `streamlit run app/app.py` (veja [01-instalar-mac.md](01-instalar-mac.md)).
+Abra a interface (veja [01-instalar.md](01-instalar.md) se ainda não instalou):
+
+- **Mac e Ubuntu:** `./scripts/abrir_interface.sh`
+- **Windows:** dois cliques em `scripts\abrir_interface.bat`
+
+O navegador abre em `http://localhost:8501`.
 
 ## Barra lateral (esquerda)
 
@@ -19,7 +24,7 @@ Abra com `streamlit run app/app.py` (veja [01-instalar-mac.md](01-instalar-mac.m
 | **Como agrupar** | *Somar* para contagens de veículos. *Média* para velocidade ou taxas. |
 | **Quantos passos prever** | O horizonte. Com "Hora", 48 = próximas 48 horas. |
 | **Quanto histórico usar** | Quantos passos recentes o modelo enxerga. |
-| **Motor** | Deixe em `auto`: usa MLX no Mac Apple silicon. |
+| **Motor** | Deixe em `auto`: usa MLX no Mac Apple silicon e PyTorch nos demais (na GPU NVIDIA, se houver; senão na CPU). |
 
 ## Área principal
 

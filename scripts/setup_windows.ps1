@@ -2,7 +2,9 @@
 # Rode no PowerShell, na raiz do repositorio:
 #   powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1
 # (so ASCII de proposito: o Windows PowerShell 5.1 nao mostra bem acentos e emojis)
-$ErrorActionPreference = "Stop"
+# Importante: nao usar $ErrorActionPreference = "Stop". No Windows PowerShell 5.1 ele transforma
+# qualquer mensagem no stderr de um programa (pip, py) em erro fatal. Checamos os codigos de saida.
+$ErrorActionPreference = "Continue"
 Set-Location (Join-Path $PSScriptRoot "..")
 
 function Stop-Setup($message) {
@@ -15,17 +17,22 @@ function Invoke-Checked($exe, $arguments) {
     if ($LASTEXITCODE -ne 0) { Stop-Setup "Falhou: $exe $($arguments -join ' ')" }
 }
 
+# Roda um programa em silencio e diz se ele terminou com sucesso.
+function Test-Runs($exe, $arguments) {
+    & $exe @arguments *> $null
+    return ($LASTEXITCODE -eq 0)
+}
+
 # --- 1. Achar um Python 3.10+ (o lancador 'py' primeiro: ignora o atalho da Microsoft Store) ---
 $pythonCmd = $null
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    foreach ($version in @("3.12", "3.11", "3.13", "3.10")) {
-        & py "-$version" -c "import sys" 2>$null
-        if ($LASTEXITCODE -eq 0) { $pythonCmd = @("py", "-$version"); break }
+    # Prefere 3.12 (a mais testada); "-3" e o Python 3 mais novo instalado.
+    foreach ($flag in @("-3.12", "-3.11", "-3.13", "-3.10", "-3")) {
+        if (Test-Runs "py" @($flag, "-c", "import sys")) { $pythonCmd = @("py", $flag); break }
     }
 }
 if (-not $pythonCmd -and (Get-Command python -ErrorAction SilentlyContinue)) {
-    & python -c "import sys" 2>$null
-    if ($LASTEXITCODE -eq 0) { $pythonCmd = @("python") }
+    if (Test-Runs "python" @("-c", "import sys")) { $pythonCmd = @("python") }
 }
 if (-not $pythonCmd) {
     Stop-Setup "Python nao encontrado. Instale em https://www.python.org/downloads/windows/ (marque 'Add python.exe to PATH') e rode de novo."
@@ -35,8 +42,7 @@ $pythonExe = $pythonCmd[0]
 $pythonArgs = @()
 if ($pythonCmd.Count -gt 1) { $pythonArgs = $pythonCmd[1..($pythonCmd.Count - 1)] }
 
-& $pythonExe @pythonArgs -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)"
-if ($LASTEXITCODE -ne 0) {
+if (-not (Test-Runs $pythonExe ($pythonArgs + @("-c", "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)")))) {
     Stop-Setup "Precisa de Python 3.10 ou mais novo. Instale um mais novo em python.org."
 }
 $pythonVersion = (& $pythonExe @pythonArgs --version)
