@@ -1,0 +1,5 @@
+numpy>=1.26
+pandas>=2.0
+streamlit>=1.50
+plotly>=5.20
+kaggle>=1.6

@@ -1,0 +1,5 @@
+# Mac com processador Intel: PyTorch em CPU (mais lento)
+-r comum.txt
+timesfm[torch]>=3.0.2
+jupyterlab>=4.0
+matplotlib>=3.8

@@ -1,0 +1,5 @@
+# Mac com Apple silicon (M1/M2/M3/M4): motor MLX, sem PyTorch
+-r comum.txt
+timesfm[mlx]>=3.0.2
+jupyterlab>=4.0
+matplotlib>=3.8
