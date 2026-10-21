@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import platform
 import sys
 from dataclasses import dataclass
@@ -35,7 +36,8 @@ class ForecastResult:
 def choose_backend(requested: str = "auto") -> str:
     """Return ``"mlx"`` or ``"torch"``.
 
-    ``auto`` uses MLX on Apple silicon when installed, otherwise PyTorch on CPU.
+    ``auto`` uses MLX on Apple silicon when installed, otherwise PyTorch (CPU, or CUDA on
+    Linux/Windows with an NVIDIA GPU; see ``choose_device``).
     """
     if requested in ("mlx", "torch"):
         return requested
@@ -47,7 +49,26 @@ def choose_backend(requested: str = "auto") -> str:
     return "torch"
 
 
-def load_forecaster(backend: str = "auto", checkpoint: str = CHECKPOINT):
+def choose_device(requested: str = "auto") -> str:
+    """Return ``"cuda"`` or ``"cpu"`` for the PyTorch backend.
+
+    ``auto`` uses an NVIDIA GPU when PyTorch can see one, otherwise the CPU. The environment
+    variable ``TRAFEGO_DEVICE`` (``cpu`` or ``cuda``) overrides ``auto``.
+    """
+    if requested == "auto":
+        requested = os.environ.get("TRAFEGO_DEVICE", "auto").lower()
+    if requested in ("cpu", "cuda"):
+        return requested
+    if requested != "auto":
+        raise ValueError("device deve ser 'auto', 'cpu' ou 'cuda'.")
+    try:
+        import torch
+    except ImportError:
+        return "cpu"
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def load_forecaster(backend: str = "auto", checkpoint: str = CHECKPOINT, device: str = "auto"):
     """Load TimesFM 3.0. The first call downloads the weights."""
     chosen = choose_backend(backend)
     if chosen == "mlx":
@@ -60,7 +81,7 @@ def load_forecaster(backend: str = "auto", checkpoint: str = CHECKPOINT):
     ensure_rmsnorm()  # Intel Macs only get PyTorch 2.2, which has no nn.RMSNorm
     from timesfm3 import TimesFM3Forecaster
 
-    return TimesFM3Forecaster.from_pretrained(checkpoint, device="cpu")
+    return TimesFM3Forecaster.from_pretrained(checkpoint, device=choose_device(device))
 
 
 def forecast(forecaster, context, horizon: int) -> ForecastResult:

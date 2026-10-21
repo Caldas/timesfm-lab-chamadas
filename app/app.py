@@ -13,7 +13,7 @@ import streamlit as st
 
 from trafego_lab.backtest import run_backtest
 from trafego_lab.dados import detect_columns, load_csv, prepare_series, resample_series
-from trafego_lab.modelo import choose_backend, forecast, load_forecaster
+from trafego_lab.modelo import choose_backend, choose_device, forecast, load_forecaster
 
 ROOT = Path(__file__).resolve().parent.parent
 # label -> (pandas frequency, season length in steps)
@@ -129,9 +129,9 @@ c3.metric("Fim", f"{series.index[-1]:%Y-%m-%d %H:%M}")
 st.plotly_chart(plot_forecast(series), width="stretch")
 chosen_backend = choose_backend(backend)
 st.caption(f"Motor que será usado: **{chosen_backend}**")
-if chosen_backend == "torch":
-    st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon. "
-            "Para acelerar, reduza o histórico e o número de passos na barra lateral.")
+if chosen_backend == "torch" and choose_device() == "cpu":
+    st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon ou numa GPU "
+            "NVIDIA. Para acelerar, reduza o histórico e o número de passos na barra lateral.")
 
 tab_forecast, tab_backtest = st.tabs(["🔮 Previsão", "🧪 Teste de realidade"])
 

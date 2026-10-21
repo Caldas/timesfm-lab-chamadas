@@ -76,6 +76,8 @@ python scripts/verificar_ambiente.py
 cat <<MSG
 
 ✅ Pronto! Para usar nas próximas vezes:
+   ./scripts/abrir_interface.sh
+ou, manualmente:
    source .venv/bin/activate
    streamlit run app/app.py
 MSG

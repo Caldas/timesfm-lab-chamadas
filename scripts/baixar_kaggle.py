@@ -29,10 +29,23 @@ def resolve_slug(name: str) -> str:
     return SUGGESTED.get(name, name)
 
 
+def find_kaggle() -> str | None:
+    """Locate the kaggle executable, preferring the one next to this Python (the venv's).
+
+    That way it works on Windows, Linux and macOS even when the venv is not activated.
+    """
+    bin_dir = Path(sys.executable).parent
+    for name in ("kaggle", "kaggle.exe"):
+        candidate = bin_dir / name
+        if candidate.exists():
+            return str(candidate)
+    return shutil.which("kaggle")
+
+
 def download(slug: str) -> Path:
     if "/" not in slug:
         raise SystemExit(f"❌ '{slug}' não é um nome conhecido nem um slug 'dono/dataset'.")
-    kaggle = shutil.which("kaggle")
+    kaggle = find_kaggle()
     if kaggle is None:
         raise SystemExit(
             "❌ Comando 'kaggle' não encontrado. Ative o .venv e rode 'pip install kaggle'. "

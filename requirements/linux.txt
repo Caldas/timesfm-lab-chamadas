@@ -1,0 +1,6 @@
+# Ubuntu/Linux: PyTorch. O script setup_linux.sh instala antes o PyTorch só-CPU (leve);
+# com --gpu ele usa a versão com CUDA, que o pip baixa por padrão no Linux (~3 GB).
+-r comum.txt
+timesfm[torch]>=3.0.2
+jupyterlab>=4.0
+matplotlib>=3.8

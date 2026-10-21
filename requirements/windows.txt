@@ -1,0 +1,5 @@
+# Windows: PyTorch. O pip já baixa a versão só-CPU no Windows (leve).
+-r comum.txt
+timesfm[torch]>=3.0.2
+jupyterlab>=4.0
+matplotlib>=3.8

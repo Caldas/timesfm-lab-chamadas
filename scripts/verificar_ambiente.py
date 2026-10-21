@@ -1,4 +1,4 @@
-"""Check that this machine is ready to run the lab.
+"""Check that this machine is ready to run the lab (macOS, Ubuntu/Linux and Windows).
 
 Usage:
     python scripts/verificar_ambiente.py                # quick checks, no model download
@@ -11,17 +11,52 @@ import argparse
 import importlib
 import os
 import platform
+import subprocess
 import sys
+from pathlib import Path
 
-from trafego_lab.modelo import choose_backend
+from trafego_lab.modelo import choose_backend, choose_device
 
 OK, FAIL = "✅", "❌"
+SETUP_HINT = {
+    "Darwin": "rode ./scripts/setup_mac.sh de novo",
+    "Linux": "rode ./scripts/setup_linux.sh de novo",
+    "Windows": r"rode scripts\setup_windows.ps1 de novo",
+}.get(platform.system(), "rode o script de instalação do seu sistema de novo")
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def ram_gb() -> float | None:
+    """Total RAM in GB, or None if it cannot be read."""
     try:
+        system = platform.system()
+        if system == "Windows":
+            import ctypes
+
+            class MemoryStatus(ctypes.Structure):
+                _fields_ = [
+                    ("dwLength", ctypes.c_ulong),
+                    ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong),
+                    ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong),
+                    ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong),
+                    ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong),
+                ]
+
+            status = MemoryStatus()
+            status.dwLength = ctypes.sizeof(MemoryStatus)
+            ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(status))
+            return status.ullTotalPhys / 1024**3
+        if system == "Darwin":
+            out = subprocess.run(
+                ["sysctl", "-n", "hw.memsize"], capture_output=True, text=True, check=True
+            )
+            return int(out.stdout.strip()) / 1024**3
         return os.sysconf("SC_PAGE_SIZE") * os.sysconf("SC_PHYS_PAGES") / 1024**3
-    except (ValueError, OSError, AttributeError):
+    except (ValueError, OSError, AttributeError, subprocess.SubprocessError):
         return None
 
 
@@ -36,27 +71,46 @@ def check_import(name: str, hint: str) -> bool:
 
 
 def check_torch() -> int:
-    """PyTorch checks, mainly for Intel Macs. Returns the number of problems found."""
+    """PyTorch checks (device, Intel Mac limits). Returns the number of problems found."""
     try:
         import numpy
         import torch
     except ImportError as exc:
-        print(f"{FAIL} torch: {exc}\n    -> rode ./scripts/setup_mac.sh de novo")
+        print(f"{FAIL} torch: {exc}\n    -> {SETUP_HINT}")
         return 1
 
     problems = 0
-    print(f"{OK} torch {torch.__version__} (CPU)")
+    device = choose_device("auto")
+    if device == "cuda":
+        print(f"{OK} torch {torch.__version__} na GPU: {torch.cuda.get_device_name(0)}")
+    else:
+        print(f"{OK} torch {torch.__version__} na CPU")
+
     if platform.system() == "Darwin" and platform.machine() == "x86_64":
         if sys.version_info >= (3, 13):
-            print(f"{FAIL} Mac Intel precisa de Python 3.10 a 3.12 (este é {platform.python_version()})."
-                  "\n    -> veja docs/06-problemas-comuns.md")
+            print(
+                f"{FAIL} Mac Intel precisa de Python 3.10 a 3.12 (este é {platform.python_version()})."
+                "\n    -> veja docs/06-problemas-comuns.md"
+            )
             problems += 1
         if int(numpy.__version__.split(".")[0]) >= 2 and torch.__version__.startswith("2.2"):
-            print(f"{FAIL} NumPy {numpy.__version__} é incompatível com o PyTorch 2.2."
-                  "\n    -> rode: pip install 'numpy<2'")
+            print(
+                f"{FAIL} NumPy {numpy.__version__} é incompatível com o PyTorch 2.2."
+                "\n    -> rode: pip install 'numpy<2'"
+            )
             problems += 1
-        print("ℹ️  Mac Intel: a previsão roda na CPU e é mais lenta. Use históricos e horizontes menores.")
+    if device == "cpu":
+        print("ℹ️  Previsão na CPU: funciona, mas é mais lenta. Use históricos e horizontes menores.")
     return problems
+
+
+def check_windows_path() -> None:
+    """Warn about Windows' long-path limit, which can break pip installs in deep folders."""
+    if platform.system() == "Windows" and len(str(ROOT)) > 80:
+        print(
+            f"⚠️  O caminho do projeto é longo ({len(str(ROOT))} caracteres). Se o pip falhar com "
+            "'WinError 206', mova o projeto para uma pasta curta (ex.: C:\\timesfm-lab)."
+        )
 
 
 def main() -> int:
@@ -69,13 +123,14 @@ def main() -> int:
 
     problems = 0
     print(f"Python {platform.python_version()} em {platform.system()} {platform.machine()}")
+    check_windows_path()
 
     memory = ram_gb()
     if memory is not None:
-        print(f"{OK if memory >= 8 else FAIL} Memória: {memory:.0f} GB (recomendado: 8 GB ou mais)")
+        print(f"{OK if memory >= 8 else '⚠️ '} Memória: {memory:.0f} GB (recomendado: 8 GB ou mais)")
 
     for module in ("numpy", "pandas", "streamlit", "plotly", "trafego_lab"):
-        problems += not check_import(module, "rode ./scripts/setup_mac.sh de novo")
+        problems += not check_import(module, SETUP_HINT)
 
     backend = choose_backend("auto")
     print(f"ℹ️  Motor escolhido: {backend}")

@@ -7,9 +7,12 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.10", "3.12"]
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +26,24 @@ jobs:
         run: ruff check .
       - name: Tests
         run: pytest -q
+
+  setup-scripts:
+    # Runs each OS's real install script, then the environment check (without downloading the model).
+    name: Setup script (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: "Ubuntu", os: ubuntu-latest, python: "3.12", cmd: "./scripts/setup_linux.sh" }
+          - { label: "Windows", os: windows-latest, python: "3.12", cmd: "powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1" }
+          - { label: "Mac Apple silicon", os: macos-latest, python: "3.12", cmd: "./scripts/setup_mac.sh" }
+          - { label: "Mac Intel", os: macos-15-intel, python: "3.12", cmd: "./scripts/setup_mac.sh" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Run setup script
+        run: ${{ matrix.cmd }}
