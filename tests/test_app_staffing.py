@@ -129,3 +129,18 @@ def test_forecast_and_reality_check_tabs_still_work(app):
     assert not app.exception
     labels = metric_labels(app)
     assert "Erro % ponderado (WAPE)" in labels and "Viés" in labels
+
+
+def test_default_interval_matches_the_30_minute_sample(app):
+    """Regression: adding interval options once moved the default to 15 minutes, doubling the intervals."""
+    interval = next(s for s in app.selectbox if s.label == "Intervalo")
+    assert interval.value == "30 minutos"
+    assert next(m for m in app.metric if m.label == "Intervalos").value == "1344"  # 4 weeks of 30-minute data
+    radio(app, "Volume a dimensionar").set_value("Últimos intervalos do histórico")
+    app.run()
+    button(app, "Dimensionar").click()
+    app.run()
+    plan = app.session_state["staffing"]["plan"]
+    assert (plan.index[1] - plan.index[0]).total_seconds() == 30 * 60
+    assert app.session_state["staffing"]["config"].interval_minutes == 30
+    assert (plan["calls"] > 0).sum() > 0.2 * len(plan)  # not every other interval empty

@@ -122,6 +122,13 @@ TMA, pontos de shrinkage, outra meta ou ocupação) e clique em **Comparar cená
 referência e as outras mostram a diferença. Se já existe uma escala, a tabela mostra também como ela cobriria cada
 cenário. Em **Sensibilidade**, escolha um parâmetro e veja o efeito de variá-lo, um de cada vez.
 
+## Aba "Acompanhamento do dia" (opcional)
+
+Compara o **plano da manhã** com as chamadas que estão chegando, avisa quando o dia sai da faixa prevista (desvio
+acumulado e intervalos seguidos fora da faixa) e **re-prevê o resto do dia**, projetando o total. Com um dia passado,
+você escolhe o horário de corte e vê se re-prever teria ajudado. Veja o
+[guia do acompanhamento do dia](11-acompanhamento-do-dia.md).
+
 ## Baixar os resultados
 
 Cada tabela tem um botão de **CSV**. O botão **Baixar tudo em Excel (.xlsx)** (nas abas Dimensionamento, Escala e

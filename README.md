@@ -33,6 +33,7 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 | Usar a interface | [docs/04-usando-a-interface.md](docs/04-usando-a-interface.md) |
 | Dimensionar a equipe (Erlang, shrinkage, simulador) | [docs/07-guia-de-dimensionamento.md](docs/07-guia-de-dimensionamento.md) |
 | Escala de turnos e cenários "e se" | [docs/08-guia-de-escala-e-cenarios.md](docs/08-guia-de-escala-e-cenarios.md) |
+| Acompanhamento do dia (alertas e re-previsão) | [docs/11-acompanhamento-do-dia.md](docs/11-acompanhamento-do-dia.md) |
 | Feriados e campanhas (calendário de eventos) | [docs/10-feriados-e-campanhas.md](docs/10-feriados-e-campanhas.md) |
 | Colunas dos dados | [docs/09-dicionario-de-dados.md](docs/09-dicionario-de-dados.md) |
 | Dúvidas de TI e de call center | [docs/05-glossario-ti.md](docs/05-glossario-ti.md) e [docs/06-problemas-comuns.md](docs/06-problemas-comuns.md) |

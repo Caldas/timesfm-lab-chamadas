@@ -67,6 +67,9 @@ aparecem neste laboratório.
 | **Evento (feriado, campanha)** | Dia que muda o volume de chamadas e que você informa em um calendário. Tem um tipo e, opcionalmente, um efeito (multiplicador do volume normal). |
 | **Efeito de um evento** | Quanto o volume muda: 1,5 = 50% a mais; 0,3 = 70% a menos. Você informa; o ajuste usa esse número. |
 | **Covariável** | Série extra, conhecida também no futuro (como os dias de evento), que se dá ao modelo junto com o histórico. |
+| **Horário de corte** | No acompanhamento do dia, o primeiro intervalo que ainda não se conhece: o que vem antes é realizado, o que vem depois é previsão. |
+| **Desvio acumulado** | Quanto o realizado do dia está acima ou abaixo do planejado até agora, em %. |
+| **Re-previsão** | Nova previsão do resto do dia, usando o que já aconteceu hoje. |
 | **Simulador** | Programa que reproduz a central chamada a chamada para conferir as fórmulas. |
 
 ## Atalhos úteis no Terminal

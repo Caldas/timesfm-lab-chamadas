@@ -20,6 +20,7 @@ from callcenter_lab.events import (
     with_event_adjustment,
 )
 from callcenter_lab.events_ui import MODE_LABELS, events_panel, mode_selector, render_comparison
+from callcenter_lab.intraday_ui import render_followup_tab
 from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
 from callcenter_lab.roster_ui import render_roster_tab
@@ -44,6 +45,10 @@ def fmt_pct(value: float, signed: bool = False) -> str:
     if pd.isna(value):
         return "n/d"
     return f"{value:+.1f}%" if signed else f"{value:.1f}%"
+
+
+# Chosen by name: a position in the dict silently changes when options are added (it did once).
+DEFAULT_INTERVAL = "30 minutos"
 
 
 st.set_page_config(page_title="TimesFM Lab — Chamadas", page_icon="📞", layout="wide")
@@ -138,7 +143,7 @@ with st.sidebar:
         df = df[df[filter_col] == filter_value]
 
     st.header("2. Parâmetros")
-    freq_label = st.selectbox("Intervalo", list(FREQUENCIES), index=2)
+    freq_label = st.selectbox("Intervalo", list(FREQUENCIES), index=list(FREQUENCIES).index(DEFAULT_INTERVAL))
     how_label = st.radio("Como agrupar", ["Somar (chamadas)", "Média (ex.: TMA, taxa)"])
     fill_label = st.radio(
         "Intervalos sem registro",
@@ -176,8 +181,8 @@ if chosen_backend == "torch" and choose_device() == "cpu":
     st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon ou numa GPU "
             "NVIDIA. Para acelerar, reduza o histórico e o número de intervalos na barra lateral.")
 
-tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios = st.tabs(
-    ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários"]
+tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios, tab_followup = st.tabs(
+    ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários", "📈 Acompanhamento do dia"]
 )
 
 # ------------------------------------------------------------- 2. previsão
@@ -268,3 +273,7 @@ with tab_roster:
 
 with tab_scenarios:
     render_scenarios_tab()
+
+with tab_followup:
+    followup_mode = next((k for k, v in MODE_LABELS.items() if v == st.session_state.get("events_mode")), "adjust")
+    render_followup_tab(series, freq, lambda: get_forecaster(backend), events, followup_mode)
