@@ -2,7 +2,7 @@
 
 Este pacote traz **só o necessário para rodar** o laboratório de previsão de chamadas com o TimesFM 3.0.
 (O código-fonte do projeto, os testes e a configuração de desenvolvimento ficam no repositório:
-https://github.com/Caldas/timesfm-lab-chamadas. Aqui o código vem compilado, na pasta `wheels/`.)
+https://github.com/Caldas/timesfm-lab-chamadas. Aqui o código vem empacotado (wheel), na pasta `wheels/`.)
 
 ## Para começar (uma vez)
 
@@ -25,7 +25,7 @@ Depois de abrir a interface, escolha `chamadas_sinteticas.csv` na barra lateral 
 
 ```
 scripts/        instaladores, atalhos de duplo clique, baixar datasets, verificar o ambiente
-wheels/         o laboratório compilado (instalado pelo script de instalação)
+wheels/         o laboratório empacotado (instalado pelo script de instalação)
 requirements/   bibliotecas de cada sistema (usadas pelo script de instalação)
 docs/           guias em português (comece por docs/01-instalar.md e docs/00-conceitos.md)
 notebooks/      notebooks didáticos (jupyter lab)

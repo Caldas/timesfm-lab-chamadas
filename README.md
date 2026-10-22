@@ -39,7 +39,7 @@ Resumo rápido (depois de ler o guia do seu sistema):
 
 Prefere não usar o terminal? Baixe o `.zip` na página de
 [Releases](https://github.com/Caldas/timesfm-lab-chamadas/releases): é um pacote **enxuto, só com o que
-se precisa para rodar** (sem o código-fonte, que vem compilado). Use os atalhos de duplo clique da pasta
+se precisa para rodar** (sem a pasta de código-fonte: o laboratório vem empacotado em `wheels/`). Use os atalhos de duplo clique da pasta
 `scripts` (`instalar_windows.bat`, `instalar_mac.command`): veja [docs/01-instalar.md](docs/01-instalar.md).
 
 Datasets públicos de chamadas:
