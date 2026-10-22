@@ -13,6 +13,14 @@ from .erlang import (
     size_staffing,
 )
 from .plan import build_plan, build_plan_range
+from .scheduling import (
+    Roster,
+    RosterRules,
+    ShiftTemplate,
+    evaluate_roster,
+    example_templates,
+    optimize_roster,
+)
 from .shrinkage import (
     ShrinkageConfig,
     daily_summary,
@@ -45,7 +53,10 @@ __all__ = [
     "ConstantAHT",
     "ProfileAHT",
     "ReplicationResult",
+    "Roster",
+    "RosterRules",
     "SeriesAHT",
+    "ShiftTemplate",
     "ShrinkageConfig",
     "SimulationResult",
     "StaffingConfig",
@@ -56,10 +67,13 @@ __all__ = [
     "erlang_a",
     "erlang_b",
     "erlang_c",
+    "evaluate_roster",
+    "example_templates",
     "forecast_aht",
     "generate_dataset",
     "load_aht_csv",
     "occupancy",
+    "optimize_roster",
     "overall_metrics",
     "preset",
     "required_agents",
