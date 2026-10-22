@@ -12,10 +12,12 @@ from callcenter_lab import datasets
 from callcenter_lab.datasets import (
     DOWNLOADABLE,
     REGISTRY,
+    aggregate_service_data,
     counts_from_timestamps,
     download_dataset,
     parse_hyndman,
     parse_nyc_hourly,
+    parse_technion_calls,
     parse_technion_month,
 )
 
@@ -26,12 +28,17 @@ HEADER = (
 )
 
 
-def technion_text(*times):
-    # Like the real files: the header has one name fewer than the rows (they start with a row number)
-    rows = [
-        f"{i}\tAA0101\t3311{i}\t0\t2\tPS\t990101\t{t}\t{t}\t5\t{t}\t0:00:09\t0\tHANG\t0:00:00\t0:00:00\t0\tNO_SERVER\tfriday"
-        for i, t in enumerate(times, start=1)
-    ]
+def technion_text(*calls):
+    """Rows like the real files. Each call is a time string (answered at once, 60 s with the agent) or a
+    tuple (time, outcome, queue_seconds, service_seconds). The header has one name fewer than the rows
+    (they start with a row number), as in the real files."""
+    rows = []
+    for i, call in enumerate(calls, start=1):
+        t, outcome, q_time, ser_time = (call, "AGENT", 0, 60) if isinstance(call, str) else call
+        rows.append(
+            f"{i}\tAA0101\t3311{i}\t0\t2\tPS\t990101\t{t}\t{t}\t5\t{t}\t0:00:09\t{q_time}\t{outcome}"
+            f"\t0:00:00\t0:00:00\t{ser_time}\tNO_SERVER\tfriday"
+        )
     return "\n".join([HEADER, *rows]) + "\n"
 
 
@@ -69,12 +76,44 @@ def test_parse_technion_month():
     assert list(counts_from_timestamps(stamps)["calls_offered"]) == [2, 1]
 
 
+def test_parse_technion_calls_reads_outcome_wait_and_handling_time():
+    text = technion_text(("0:00:31", "AGENT", 12, 200), ("0:10:00", "HANG", 45, 0), ("0:40:00", "PHANTOM", 3, 0))
+    calls = parse_technion_calls(text)
+    assert list(calls["outcome"]) == ["AGENT", "HANG", "PHANTOM"]
+    assert list(calls["wait_seconds"]) == [12, 45, 3]
+    assert list(calls["handle_seconds"]) == [200, 0, 0]
+
+
+def test_aggregate_service_data_per_interval():
+    text = technion_text(
+        ("0:00:31", "AGENT", 10, 200),   # answered within 20 s
+        ("0:10:00", "AGENT", 30, 100),   # answered, but after 20 s
+        ("0:20:00", "HANG", 50, 0),      # hung up
+        ("0:40:00", "PHANTOM", 3, 0),    # other
+    )
+    out = aggregate_service_data(parse_technion_calls(text), "30min", threshold_seconds=20)
+    first, second = out.iloc[0], out.iloc[1]
+    assert (first["calls_offered"], first["calls_answered"], first["calls_abandoned"], first["calls_other"]) == (3, 2, 1, 0)
+    assert first["aht_seconds"] == 150.0  # mean of 200 and 100
+    assert first["avg_wait_seconds"] == 20.0  # mean of 10 and 30, answered calls only
+    assert first["service_level_pct"] == pytest.approx(100 / 3, abs=0.1)  # 1 of 3 offered answered in 20 s
+    assert (second["calls_offered"], second["calls_other"]) == (1, 1)
+    assert pd.isna(second["aht_seconds"]) and second["service_level_pct"] == 0.0
+
+
+def test_aggregate_service_data_fills_empty_intervals_with_zero_counts():
+    text = technion_text(("0:05:00", "AGENT", 0, 60), ("2:05:00", "AGENT", 0, 60))
+    out = aggregate_service_data(parse_technion_calls(text), "30min")
+    assert len(out) == 5 and list(out["calls_offered"]) == [1, 0, 0, 0, 1]
+    assert pd.isna(out["service_level_pct"].iloc[1])  # nothing offered: undefined, not zero
+
+
 def test_parse_hyndman_grid_to_regular_5min_series():
     out = parse_hyndman(HYNDMAN_TEXT).set_index("timestamp")["calls_offered"]
     assert out.loc["2003-03-03 07:05"] == 11
     assert out.loc["2003-03-04 07:00"] == 20
     assert out.loc["2003-03-03 08:00"] == 0  # no data between the two days: closed
-    assert pd.infer_freq(out.index) == "5min"
+    assert (out.index[1] - out.index[0]) == pd.Timedelta(minutes=5)
 
 
 def test_parse_nyc_hourly_fills_missing_hours():
@@ -111,6 +150,8 @@ def test_download_technion_with_fake_fetch(tmp_path):
     csv_path = download_dataset("technion-bank", tmp_path, fetch=fake, log=lambda m: None)
     df = pd.read_csv(csv_path)
     assert df["calls_offered"].sum() == 2 * 12  # the same two calls in each of the 12 files
+    assert {"calls_answered", "calls_abandoned", "aht_seconds", "avg_wait_seconds", "service_level_pct"} <= set(df.columns)
+    assert df["calls_answered"].sum() == 2 * 12
 
 
 def test_download_nyc_with_fake_fetch(tmp_path):

@@ -53,10 +53,22 @@ REGISTRY: dict[str, Dataset] = {
         approx_size="~80 KB",
         downloadable=False,
     ),
+    "synthetic-service": Dataset(
+        id="synthetic-service",
+        title="Atendimento sintético (gerado pelo simulador)",
+        summary="Como o relatório de uma central: chamadas, atendidas, abandonos, TMA, espera e nível de serviço por 30 min, saída do simulador.",
+        source_url="https://github.com/Caldas/timesfm-lab-chamadas",
+        license="MIT (gerado por este projeto)",
+        attribution="Gerado por scripts/gerar_amostra.py com o simulador de callcenter_lab.wfm",
+        granularity="30 minutos",
+        period="12 semanas a partir de 2024-03-04",
+        approx_size="~350 KB",
+        downloadable=False,
+    ),
     "technion-bank": Dataset(
         id="technion-bank",
         title="Banco anônimo de Israel (Technion / Mandelbaum)",
-        summary="Uma chamada por linha numa central de banco, 12 meses de 1999; agregado em chamadas por 30 min.",
+        summary="Uma chamada por linha numa central de banco, 12 meses de 1999; agregado por 30 min com chamadas, atendidas, abandonos, TMA, espera e nível de serviço.",
         source_url="https://www.math-stat.unibe.ch/studium/skripten_und_lehrmaterial/datensaetze_imsv/callcenter/index_ger.html",
         license="Sem licença formal: livre para uso, citando a fonte e avisando o Prof. Avi Mandelbaum",
         attribution=(
@@ -128,14 +140,66 @@ def counts_from_timestamps(timestamps, freq: str = "30min") -> pd.DataFrame:
     return pd.DataFrame({"timestamp": counts.index, "calls_offered": counts.to_numpy().astype(int)})
 
 
-def parse_technion_month(text: str) -> pd.DatetimeIndex:
-    """Arrival time of every call in one monthly Technion file (tab-separated, one call per row)."""
+def parse_technion_calls(text: str) -> pd.DataFrame:
+    """One monthly Technion file -> one row per call: arrival time, outcome, queue wait and handling time.
+
+    Fields used: ``date`` + ``vru_entry`` (arrival), ``outcome`` (AGENT = answered by an agent,
+    HANG = the caller hung up, PHANTOM = a third class the dataset reports separately),
+    ``q_time`` (seconds in the queue) and ``ser_time`` (seconds with the agent).
+    """
     # The header has one name fewer than the rows (R wrote row numbers), so pandas uses the first
     # column as the index on its own; do not pass index_col.
-    df = pd.read_csv(io.StringIO(text), sep="\t")
+    df = pd.read_csv(io.StringIO(text), sep="	")
     day = pd.to_datetime(df["date"].astype(str).str.zfill(6), format="%y%m%d", errors="coerce")
     clock = pd.to_timedelta(df["vru_entry"].astype(str), errors="coerce")
-    return pd.DatetimeIndex((day + clock).dropna())
+    calls = pd.DataFrame(
+        {
+            "timestamp": day + clock,
+            "outcome": df["outcome"].astype(str).str.strip().str.upper(),
+            "wait_seconds": pd.to_numeric(df["q_time"], errors="coerce"),
+            "handle_seconds": pd.to_numeric(df["ser_time"], errors="coerce"),
+        }
+    )
+    return calls.dropna(subset=["timestamp"]).reset_index(drop=True)
+
+
+def parse_technion_month(text: str) -> pd.DatetimeIndex:
+    """Arrival time of every call in one monthly Technion file."""
+    return pd.DatetimeIndex(parse_technion_calls(text)["timestamp"])
+
+
+def aggregate_service_data(calls: pd.DataFrame, freq: str = "30min", threshold_seconds: float = 20.0) -> pd.DataFrame:
+    """Per-call rows -> the per-interval table a call-center report gives.
+
+    Columns: ``calls_offered`` (all calls), ``calls_answered`` (outcome AGENT), ``calls_abandoned``
+    (HANG), ``calls_other`` (anything else, e.g. PHANTOM), ``aht_seconds`` and ``avg_wait_seconds``
+    (mean over answered calls) and ``service_level_pct`` (answered within the threshold / offered).
+    Intervals without calls have zero counts and empty (NaN) averages.
+    """
+    frame = calls.copy()
+    frame["answered"] = frame["outcome"] == "AGENT"
+    frame["abandoned"] = frame["outcome"] == "HANG"
+    frame["within"] = frame["answered"] & (frame["wait_seconds"] <= threshold_seconds)
+    frame["handle_answered"] = frame["handle_seconds"].where(frame["answered"])
+    frame["wait_answered"] = frame["wait_seconds"].where(frame["answered"])
+    grouped = frame.set_index("timestamp").sort_index().resample(freq)
+    offered = grouped.size()
+    answered = grouped["answered"].sum()
+    abandoned = grouped["abandoned"].sum()
+    within = grouped["within"].sum()
+    out = pd.DataFrame(
+        {
+            "timestamp": offered.index,
+            "calls_offered": offered.to_numpy().astype(int),
+            "calls_answered": answered.to_numpy().astype(int),
+            "calls_abandoned": abandoned.to_numpy().astype(int),
+            "calls_other": (offered - answered - abandoned).to_numpy().astype(int),
+            "aht_seconds": grouped["handle_answered"].mean().to_numpy().round(1),
+            "avg_wait_seconds": grouped["wait_answered"].mean().to_numpy().round(1),
+            "service_level_pct": (100 * within / offered.where(offered > 0)).to_numpy().round(1),
+        }
+    )
+    return out
 
 
 def parse_hyndman(text: str) -> pd.DataFrame:
@@ -223,14 +287,14 @@ def download_dataset(
     raw = folder / "_raw"
 
     if dataset_id == "technion-bank":
-        stamps: list[pd.DatetimeIndex] = []
+        monthly: list[pd.DataFrame] = []
         for month, file_id in TECHNION_FILES.items():
             log(f"[INFO] technion-bank: {month} ...")
             blob = _cached(raw / f"{month}.txt.zip", f"{BERN_BASE}{file_id}/{month}.txt_ger.zip", fetch, force)
             with zipfile.ZipFile(io.BytesIO(blob)) as archive:
                 text = archive.read(archive.namelist()[0]).decode("latin-1")
-            stamps.append(parse_technion_month(text))
-        result = counts_from_timestamps(np.concatenate([s.to_numpy() for s in stamps]), "30min")
+            monthly.append(parse_technion_calls(text))
+        result = aggregate_service_data(pd.concat(monthly, ignore_index=True), "30min")
     elif dataset_id == "hyndman-bank":
         log("[INFO] hyndman-bank: baixando ...")
         blob = _cached(raw / "callcenter.txt", HYNDMAN_URL, fetch, force)

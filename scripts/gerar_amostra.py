@@ -1,12 +1,25 @@
-"""Regenerate data/samples/chamadas_sinteticas.csv."""
+"""Regenerate the sample files in data/samples/: call volumes and the matching service data."""
 
 from pathlib import Path
 
 from callcenter_lab.synthetic import make_synthetic_calls
+from callcenter_lab.wfm import StaffingConfig, generate_dataset, synthetic_aht
+from callcenter_lab.wfm.workload import SeriesAHT
 
-OUT = Path(__file__).resolve().parent.parent / "data" / "samples" / "chamadas_sinteticas.csv"
+SAMPLES = Path(__file__).resolve().parent.parent / "data" / "samples"
 
 if __name__ == "__main__":
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    make_synthetic_calls().to_csv(OUT, index=False)
-    print(f"Gerado: {OUT}")
+    SAMPLES.mkdir(parents=True, exist_ok=True)
+    volume = make_synthetic_calls()
+    volume.to_csv(SAMPLES / "chamadas_sinteticas.csv", index=False)
+    print(f"Gerado: {SAMPLES / 'chamadas_sinteticas.csv'}")
+
+    # Service data: simulate the same days with a staffing plan for the default goal and callers
+    # who hang up after ~2 minutes on average.
+    calls = volume.set_index("timestamp")["calls_offered"].astype(float)
+    config = StaffingConfig(mean_patience_seconds=120)
+    aht = SeriesAHT(synthetic_aht(calls.index, config.aht_seconds), config.aht_seconds)
+    service = generate_dataset(calls, config, aht=aht, seed=42)
+    numeric = {"aht_seconds": 1, "avg_wait_seconds": 1, "service_level_pct": 1, "occupancy_pct": 1}
+    service.round(numeric).to_csv(SAMPLES / "chamadas_sinteticas_atendimento.csv", index=False)
+    print(f"Gerado: {SAMPLES / 'chamadas_sinteticas_atendimento.csv'}")
