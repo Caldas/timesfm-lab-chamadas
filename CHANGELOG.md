@@ -22,6 +22,12 @@ Primeira versão estável.
   segunda execução idempotente, instalação a partir de um Ubuntu sem Python e, sob demanda, uma
   previsão real com o modelo.
 
+### Pacote do release
+- O `.zip`/`.tar.gz` do release é **enxuto**: só traz o necessário para rodar (instaladores, atalhos,
+  requisitos, docs, notebooks, dado de exemplo e o laboratório compilado em `wheels/`). Não inclui
+  `src/`, `tests/` nem a configuração de desenvolvimento. É montado por `scripts/montar_release.py`.
+- A interface abre com `python -m callcenter_lab` (ou pelos atalhos).
+
 ### Limitações conhecidas
 - Uso de GPU NVIDIA (`--gpu`), Windows ARM64 e Linux ARM não foram testados.
 - O download dos datasets depende de sites de terceiros; os testes automáticos usam respostas

@@ -125,8 +125,19 @@ else
   "$VENV_PY" -m pip install --upgrade pip
   "$VENV_PY" -m pip install -r "$REQ"
 fi
-if "$VENV_PY" -c "import callcenter_lab" >/dev/null 2>&1; then
-  echo "[REUSO] Pacote callcenter_lab já instalado."
+# O próprio laboratório: no pacote do release vem como wheel (pasta wheels/); no repositório, em modo editável.
+WHEEL="$(ls wheels/callcenter_lab-*.whl 2>/dev/null | head -n 1 || true)"
+INSTALLED="$("$VENV_PY" -c 'import callcenter_lab; print(callcenter_lab.__version__)' 2>/dev/null || true)"
+if [[ -n "$WHEEL" ]]; then
+  WHEEL_VERSION="$(basename "$WHEEL" | cut -d- -f2)"
+  if [[ "$FORCE" == "0" && "$INSTALLED" == "$WHEEL_VERSION" ]]; then
+    echo "[REUSO] Pacote callcenter_lab $INSTALLED já instalado."
+  else
+    echo "[INFO] Instalando o pacote callcenter_lab $WHEEL_VERSION ..."
+    "$VENV_PY" -m pip install --no-deps --force-reinstall "$WHEEL"
+  fi
+elif [[ -n "$INSTALLED" ]]; then
+  echo "[REUSO] Pacote callcenter_lab $INSTALLED já instalado."
 else
   "$VENV_PY" -m pip install -e . --no-deps
 fi
@@ -141,5 +152,5 @@ cat <<MSG
    ./scripts/abrir_interface.sh
 ou, manualmente:
    source .venv/bin/activate
-   streamlit run app/app.py
+   python -m callcenter_lab
 MSG

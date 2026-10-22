@@ -59,6 +59,88 @@ jobs:
             exit 1
           fi
 
+  release-bundle:
+    # Builds the slim release bundle and uses it exactly as a user would: unzip, install, open the app.
+    name: Release bundle (${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: "Ubuntu", os: ubuntu-latest, cmd: "./scripts/setup_linux.sh", python_bin: ".venv/bin/python" }
+          - { label: "Windows", os: windows-latest, cmd: "./scripts/instalar_windows.bat < /dev/null", python_bin: ".venv/Scripts/python.exe" }
+          - { label: "Mac Apple silicon", os: macos-latest, cmd: "./scripts/instalar_mac.command < /dev/null", python_bin: ".venv/bin/python" }
+          - { label: "Mac Intel", os: macos-15-intel, cmd: "./scripts/instalar_mac.command < /dev/null", python_bin: ".venv/bin/python" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the bundle
+        shell: bash
+        run: python scripts/montar_release.py --saida dist
+      - name: Unzip it like a user would
+        shell: bash
+        run: |
+          mkdir bundle-test
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            python -c "import zipfile, glob; zipfile.ZipFile(glob.glob('dist/*.zip')[0]).extractall('bundle-test')"
+          else
+            unzip -q dist/*.zip -d bundle-test
+          fi
+          ls bundle-test/*/
+      - name: The bundle has no project source code
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          for forbidden in src tests .github app pyproject.toml; do
+            if [[ -e "$forbidden" ]]; then echo "Não deveria existir no pacote: $forbidden"; exit 1; fi
+          done
+          ls wheels/
+      - name: Install from the bundle
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.cmd }}
+      - name: Install again (must reuse everything)
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.cmd }} 2>&1 | tee second-run.log
+          grep -Eq "REUSO\] Pacote callcenter_lab" second-run.log
+          if grep -Eq "Instalando as depend|Instalando o pacote" second-run.log; then
+            echo "A segunda execução reinstalou algo, mas deveria reaproveitar tudo."
+            exit 1
+          fi
+      - name: Open the interface from the bundle
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.python_bin }} -m callcenter_lab --server.headless true --server.port 8765 > app.log 2>&1 &
+          APP_PID=$!
+          ok=no
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8765/_stcore/health | grep -q ok; then ok=yes; break; fi
+            sleep 2
+          done
+          kill $APP_PID 2>/dev/null || true
+          if [[ "$ok" != "yes" ]]; then echo "A interface não subiu"; cat app.log; exit 1; fi
+      - name: The interface sees the sample dataset
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.python_bin }} - <<'EOF'
+          from pathlib import Path
+          import callcenter_lab
+          from streamlit.testing.v1 import AppTest
+          at = AppTest.from_file(str(Path(callcenter_lab.__file__).with_name("app.py")), default_timeout=60).run()
+          assert not at.exception, at.exception
+          options = [str(o).replace("\\", "/") for o in at.selectbox[0].options]
+          assert any(o.endswith("samples/chamadas_sinteticas.csv") for o in options), options
+          print("ok:", options)
+          EOF
+
   setup-bare-ubuntu:
     # A fresh Ubuntu with no Python at all: the script must offer/perform the apt install itself.
     name: Setup script (bare Ubuntu, no Python)

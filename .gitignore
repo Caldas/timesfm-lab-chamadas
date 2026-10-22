@@ -13,3 +13,7 @@ data/kaggle/
 # credenciais
 kaggle.json
 .env
+
+# release bundle built by scripts/montar_release.py
+dist/
+build/

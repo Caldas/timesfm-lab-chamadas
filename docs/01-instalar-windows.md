@@ -76,7 +76,7 @@ funcionando.
 Ou pelo PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe -m streamlit run app\app.py
+.\.venv\Scripts\python.exe -m callcenter_lab
 ```
 
 O navegador abre em `http://localhost:8501`. Para fechar, feche a janela preta ou aperte `Ctrl + C`.

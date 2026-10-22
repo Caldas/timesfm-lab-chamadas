@@ -27,4 +27,4 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-src = ["src", "app", "scripts", "tests"]
+src = ["src", "scripts", "tests"]

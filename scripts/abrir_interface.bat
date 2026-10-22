@@ -9,5 +9,5 @@ if not exist ".venv\Scripts\python.exe" (
   exit /b 1
 )
 
-".venv\Scripts\python.exe" -m streamlit run app\app.py %*
+".venv\Scripts\python.exe" -m callcenter_lab %*
 pause

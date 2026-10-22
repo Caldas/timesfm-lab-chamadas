@@ -1,10 +1,11 @@
 """Interface Streamlit do laboratório TimesFM para centrais de atendimento telefônico.
 
-Run with: streamlit run app/app.py
+Run with: python -m callcenter_lab (see __main__.py), which points DATA at <project>/data.
 """
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -15,7 +16,8 @@ from callcenter_lab.backtest import run_backtest
 from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
 
-ROOT = Path(__file__).resolve().parent.parent
+# Where the sample and downloaded datasets live (set by ``python -m callcenter_lab``).
+DATA_DIR = Path(os.environ.get("CALLCENTER_LAB_DATA", Path.cwd() / "data"))
 # label -> (pandas frequency, length of one week in steps: the "same time last week" baseline)
 FREQUENCIES = {
     "5 minutos": ("5min", 12 * 24 * 7),
@@ -41,8 +43,8 @@ def get_forecaster(backend: str):
 
 
 def available_files() -> list[Path]:
-    found = sorted((ROOT / "data" / "samples").glob("*.csv"))
-    found += sorted((ROOT / "data" / "raw").rglob("*.csv"))
+    found = sorted((DATA_DIR / "samples").glob("*.csv"))
+    found += sorted((DATA_DIR / "raw").rglob("*.csv"))
     return found
 
 

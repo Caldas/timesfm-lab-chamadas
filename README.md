@@ -38,8 +38,9 @@ Resumo rápido (depois de ler o guia do seu sistema):
 | Windows | `powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1` | dois cliques em `scripts\abrir_interface.bat` |
 
 Prefere não usar o terminal? Baixe o `.zip` na página de
-[Releases](https://github.com/Caldas/timesfm-lab-chamadas/releases) e use os atalhos de duplo clique da
-pasta `scripts` (`instalar_windows.bat`, `instalar_mac.command`): veja [docs/01-instalar.md](docs/01-instalar.md).
+[Releases](https://github.com/Caldas/timesfm-lab-chamadas/releases): é um pacote **enxuto, só com o que
+se precisa para rodar** (sem o código-fonte, que vem compilado). Use os atalhos de duplo clique da pasta
+`scripts` (`instalar_windows.bat`, `instalar_mac.command`): veja [docs/01-instalar.md](docs/01-instalar.md).
 
 Datasets públicos de chamadas:
 
@@ -80,8 +81,7 @@ respostas simuladas, para não depender de sites de terceiros).
 ## Estrutura
 
 ```
-app/                  interface Streamlit
-src/callcenter_lab/   código (loading, metrics, model, backtest, datasets, synthetic)
+src/callcenter_lab/   código: interface Streamlit (app.py), loading, metrics, model, backtest, datasets, synthetic
 notebooks/            notebooks didáticos
 data/samples/         dado de exemplo (sintético)
 data/README.md        datasets públicos: fontes, licenças e condições de uso
@@ -89,6 +89,7 @@ docs/                 guias em português
 scripts/              instalação por sistema (setup_mac.sh, setup_linux.sh, setup_windows.ps1),
                       abrir a interface, verificar o ambiente e baixar datasets
 tests/                testes unitários básicos
+release/              texto do LEIA-ME do pacote; scripts/montar_release.py monta o release
 ```
 
 ## Licenças — leia

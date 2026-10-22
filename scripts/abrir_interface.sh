@@ -10,4 +10,4 @@ if [[ ! -x .venv/bin/python ]]; then
   exit 1
 fi
 
-exec .venv/bin/python -m streamlit run app/app.py "$@"
+exec .venv/bin/python -m callcenter_lab "$@"

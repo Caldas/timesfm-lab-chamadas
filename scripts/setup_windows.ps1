@@ -112,8 +112,20 @@ if ((-not $Reinstalar) -and (-not $missing)) {
     Invoke-Checked $venvPython @("-m", "pip", "install", "--upgrade", "pip")
     Invoke-Checked $venvPython @("-m", "pip", "install", "-r", "requirements\windows.txt")
 }
-if (Test-Runs $venvPython @("-c", "import callcenter_lab")) {
-    Write-Host "[REUSO] Pacote callcenter_lab ja instalado."
+# O proprio laboratorio: no pacote do release vem como wheel (pasta wheels\); no repositorio, em modo editavel.
+$wheel = Get-ChildItem "wheels\callcenter_lab-*.whl" -ErrorAction SilentlyContinue | Select-Object -First 1
+$installed = (& $venvPython -c "import callcenter_lab; print(callcenter_lab.__version__)" 2>$null | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { $installed = "" }
+if ($wheel) {
+    $wheelVersion = ($wheel.Name -split "-")[1]
+    if ((-not $Reinstalar) -and ($installed -eq $wheelVersion)) {
+        Write-Host "[REUSO] Pacote callcenter_lab $installed ja instalado."
+    } else {
+        Write-Host "[INFO] Instalando o pacote callcenter_lab $wheelVersion ..."
+        Invoke-Checked $venvPython @("-m", "pip", "install", "--no-deps", "--force-reinstall", $wheel.FullName)
+    }
+} elseif ($installed) {
+    Write-Host "[REUSO] Pacote callcenter_lab $installed ja instalado."
 } else {
     Invoke-Checked $venvPython @("-m", "pip", "install", "-e", ".", "--no-deps")
 }
@@ -126,4 +138,4 @@ Write-Host ""
 Write-Host "[OK] Pronto! Para abrir a interface nas proximas vezes:" -ForegroundColor Green
 Write-Host "   de dois cliques em scripts\abrir_interface.bat"
 Write-Host "ou, no PowerShell:"
-Write-Host "   .\.venv\Scripts\python.exe -m streamlit run app\app.py"
+Write-Host "   .\.venv\Scripts\python.exe -m callcenter_lab"
