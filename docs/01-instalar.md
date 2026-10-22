@@ -12,6 +12,23 @@ instalação, otimizado para ele.
 
 Para saber qual Mac você tem: menu  → **Sobre Este Mac**.
 
+## Sem usar o terminal: atalhos de duplo clique
+
+Se você baixou o pacote `.zip` do [release](https://github.com/Caldas/timesfm-lab-chamadas/releases),
+descompacte e use os atalhos dentro da pasta `scripts`:
+
+| Sistema | Instalar (uma vez) | Abrir a interface |
+|---|---|---|
+| Windows | `scripts\instalar_windows.bat` | `scripts\abrir_interface.bat` |
+| Mac | `scripts/instalar_mac.command` | `scripts/abrir_interface.command` |
+| Ubuntu | `./scripts/setup_linux.sh` (terminal) | `./scripts/abrir_interface.sh` (terminal) |
+
+- **Windows:** se o Windows mostrar "O Windows protegeu o computador", clique em **Mais informações** e
+  depois em **Executar assim mesmo**.
+- **Mac:** na primeira vez, o macOS pode bloquear o arquivo (veio da internet). Clique com o botão
+  direito, **Abrir**, e confirme em **Abrir**. Se aparecer "permissão negada", abra o Terminal na pasta
+  do projeto e rode `chmod +x scripts/*.command scripts/*.sh`.
+
 ## O que os scripts fazem (todos)
 
 Os scripts **primeiro verificam o que já existe** e só instalam o que falta. Podem ser rodados quantas

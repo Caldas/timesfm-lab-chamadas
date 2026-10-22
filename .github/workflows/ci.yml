@@ -38,15 +38,16 @@ jobs:
       matrix:
         include:
           - { label: "Ubuntu", os: ubuntu-latest, python: "3.12", cmd: "./scripts/setup_linux.sh" }
-          - { label: "Windows", os: windows-latest, python: "3.12", cmd: "powershell -ExecutionPolicy Bypass -File scripts/setup_windows.ps1" }
-          - { label: "Mac Apple silicon", os: macos-latest, python: "3.12", cmd: "./scripts/setup_mac.sh" }
-          - { label: "Mac Intel", os: macos-15-intel, python: "3.12", cmd: "./scripts/setup_mac.sh" }
+          - { label: "Windows", os: windows-latest, python: "3.12", cmd: "./scripts/instalar_windows.bat < /dev/null" }
+          - { label: "Mac Apple silicon", os: macos-latest, python: "3.12", cmd: "./scripts/instalar_mac.command < /dev/null" }
+          - { label: "Mac Intel", os: macos-15-intel, python: "3.12", cmd: "./scripts/instalar_mac.command < /dev/null" }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Run setup script
+        shell: bash
         run: ${{ matrix.cmd }}
       - name: Run setup script again (must reuse everything and install nothing)
         shell: bash

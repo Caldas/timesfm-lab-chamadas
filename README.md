@@ -37,6 +37,10 @@ Resumo rápido (depois de ler o guia do seu sistema):
 | Ubuntu | `./scripts/setup_linux.sh` (ou `--gpu` com placa NVIDIA) | `./scripts/abrir_interface.sh` |
 | Windows | `powershell -ExecutionPolicy Bypass -File scripts\setup_windows.ps1` | dois cliques em `scripts\abrir_interface.bat` |
 
+Prefere não usar o terminal? Baixe o `.zip` na página de
+[Releases](https://github.com/Caldas/timesfm-lab-chamadas/releases) e use os atalhos de duplo clique da
+pasta `scripts` (`instalar_windows.bat`, `instalar_mac.command`): veja [docs/01-instalar.md](docs/01-instalar.md).
+
 Datasets públicos de chamadas:
 
 ```bash
