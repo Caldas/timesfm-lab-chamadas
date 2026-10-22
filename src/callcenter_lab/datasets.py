@@ -65,6 +65,18 @@ REGISTRY: dict[str, Dataset] = {
         approx_size="~350 KB",
         downloadable=False,
     ),
+    "synthetic-events": Dataset(
+        id="synthetic-events",
+        title="Chamadas sintéticas com feriados e campanhas (gerado)",
+        summary="As mesmas 12 semanas, com dois feriados (volume 0,3x) e três campanhas (1,5x), e o calendário de eventos correspondente.",
+        source_url="https://github.com/Caldas/timesfm-lab-chamadas",
+        license="MIT (gerado por este projeto)",
+        attribution="Gerado por scripts/gerar_amostra.py",
+        granularity="30 minutos",
+        period="12 semanas a partir de 2024-03-04",
+        approx_size="~90 KB",
+        downloadable=False,
+    ),
     "technion-bank": Dataset(
         id="technion-bank",
         title="Banco anônimo de Israel (Technion / Mandelbaum)",

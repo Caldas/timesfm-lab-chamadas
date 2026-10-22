@@ -60,6 +60,12 @@ Como ler os números:
 Se o trecho escondido não tiver chamadas (por exemplo, só domingo, com a central fechada), os
 percentuais aparecem como "n/d": escolha outro horizonte.
 
+## Eventos (opcional)
+
+Na barra lateral, **4. Eventos: feriados e campanhas** carrega um calendário de eventos (CSV). Com ele, a aba
+Previsão pergunta **como usar os eventos** (ajuste pelo efeito informado, covariáveis do modelo ou não usar), e o
+teste de realidade mostra **Com e sem eventos**. Veja o [guia de feriados e campanhas](10-feriados-e-campanhas.md).
+
 ## Aba "Dimensionamento"
 
 Transforma o volume de chamadas em **quantos agentes cada intervalo precisa**. A explicação da conta está no

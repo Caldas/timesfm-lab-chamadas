@@ -64,6 +64,9 @@ aparecem neste laboratório.
 | **Falta e sobra** | Pessoas a menos ou a mais que a necessidade em um intervalo. A escala mostra as duas. |
 | **Cenário "e se"** | Uma versão do dimensionamento com algo diferente (volume, TMA, shrinkage ou meta) para comparar com a base. |
 | **Sensibilidade** | O efeito de mudar um parâmetro de cada vez (ex.: TMA +5%, +10%) no dimensionamento. |
+| **Evento (feriado, campanha)** | Dia que muda o volume de chamadas e que você informa em um calendário. Tem um tipo e, opcionalmente, um efeito (multiplicador do volume normal). |
+| **Efeito de um evento** | Quanto o volume muda: 1,5 = 50% a mais; 0,3 = 70% a menos. Você informa; o ajuste usa esse número. |
+| **Covariável** | Série extra, conhecida também no futuro (como os dias de evento), que se dá ao modelo junto com o histórico. |
 | **Simulador** | Programa que reproduz a central chamada a chamada para conferir as fórmulas. |
 
 ## Atalhos úteis no Terminal

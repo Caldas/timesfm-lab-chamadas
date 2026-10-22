@@ -2,7 +2,11 @@
 
 from pathlib import Path
 
-from callcenter_lab.synthetic import make_synthetic_calls
+from callcenter_lab.synthetic import (
+    make_synthetic_calls,
+    make_synthetic_calls_with_events,
+    make_synthetic_events,
+)
 from callcenter_lab.wfm import StaffingConfig, generate_dataset, synthetic_aht
 from callcenter_lab.wfm.workload import SeriesAHT
 
@@ -23,3 +27,9 @@ if __name__ == "__main__":
     numeric = {"aht_seconds": 1, "avg_wait_seconds": 1, "service_level_pct": 1, "occupancy_pct": 1}
     service.round(numeric).to_csv(SAMPLES / "chamadas_sinteticas_atendimento.csv", index=False)
     print(f"Gerado: {SAMPLES / 'chamadas_sinteticas_atendimento.csv'}")
+
+    # Calls that follow an event calendar (holidays and campaigns), plus the calendar itself.
+    make_synthetic_calls_with_events().to_csv(SAMPLES / "chamadas_sinteticas_eventos.csv", index=False)
+    (SAMPLES / "eventos").mkdir(exist_ok=True)
+    make_synthetic_events().to_csv(SAMPLES / "eventos" / "eventos_exemplo.csv", index=False)
+    print(f"Gerado: {SAMPLES / 'chamadas_sinteticas_eventos.csv'} e {SAMPLES / 'eventos' / 'eventos_exemplo.csv'}")

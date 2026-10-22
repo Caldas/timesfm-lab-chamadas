@@ -43,6 +43,7 @@ originais, que têm condições de uso diferentes (abaixo).
 |---|---|---|---|---|
 | `synthetic` | central fictícia (gerado), já incluído | 30 min | 12 semanas | ~80 KB |
 | `synthetic-service` | a mesma central, com dados de atendimento (gerado pelo simulador), já incluído | 30 min | 12 semanas | ~350 KB |
+| `synthetic-events` | a mesma central, com feriados e campanhas e o calendário de eventos, já incluído | 30 min | 12 semanas | ~90 KB |
 | `technion-bank` | banco de Israel | 30 min (agregado de chamadas individuais) | 1999 (12 meses) | ~12 MB baixados |
 | `hyndman-bank` | banco norte-americano | 5 min, dias úteis 7h–21h | mar–out/2003 | ~110 KB baixados |
 | `nyc-311` | linha 311 de Nova York | 1 hora (agregado no servidor) | 2016–2019 (padrão) | ~1 MB de CSV |
@@ -53,6 +54,13 @@ originais, que têm condições de uso diferentes (abaixo).
 - Central aberta seg–sex 8h–20h e sáb 8h–14h, fechada aos domingos; pico no fim da manhã, pico menor
   à tarde, segundas mais cheias e sextas mais calmas.
 - Licença: MIT, como o resto do projeto (https://github.com/Caldas/timesfm-lab-chamadas). Serve para testar sem internet.
+
+### `synthetic-events`: feriados e campanhas sintéticos
+
+- Gerado por `scripts/gerar_amostra.py`: as mesmas 12 semanas, com dois feriados (volume 0,3x) e três campanhas
+  (1,5x), a última nos dois dias finais. Arquivos: `samples/chamadas_sinteticas_eventos.csv` (as chamadas) e
+  `samples/eventos/eventos_exemplo.csv` (o calendário).
+- Serve para estudar o [calendário de eventos](../docs/10-feriados-e-campanhas.md). Licença: MIT.
 
 ### `synthetic-service`: atendimento sintético
 

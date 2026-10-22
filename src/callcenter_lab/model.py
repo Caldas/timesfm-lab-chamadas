@@ -84,12 +84,25 @@ def load_forecaster(backend: str = "auto", checkpoint: str = CHECKPOINT, device:
     return TimesFM3Forecaster.from_pretrained(checkpoint, device=choose_device(device))
 
 
-def forecast(forecaster, context, horizon: int) -> ForecastResult:
-    """Forecast ``horizon`` steps ahead from a 1-D history."""
+def forecast(forecaster, context, horizon: int, covariates=None) -> ForecastResult:
+    """Forecast ``horizon`` steps ahead from a 1-D history.
+
+    ``covariates`` (optional) are extra series known for the past *and* the future, such as calendar events:
+    an array of shape ``(n_covariates, len(context) + horizon)``.
+    """
     history = np.asarray(context, dtype=np.float32)
     if history.ndim != 1 or history.size < 2:
         raise ValueError("O histórico precisa ser uma série 1D com ao menos 2 pontos.")
     if horizon < 1:
         raise ValueError("horizon deve ser >= 1.")
-    out = forecaster.predict(history, horizon=horizon, return_quantiles=True, make_positive=True)
+    extra = {}
+    if covariates is not None:
+        matrix = np.atleast_2d(np.asarray(covariates, dtype=np.float32))
+        if matrix.shape[1] != history.size + horizon:
+            raise ValueError(
+                f"As covariáveis precisam cobrir o histórico e o futuro: esperava {history.size + horizon} "
+                f"pontos por série, recebi {matrix.shape[1]}."
+            )
+        extra["past_future_covariates"] = matrix
+    out = forecaster.predict(history, horizon=horizon, return_quantiles=True, make_positive=True, **extra)
     return ForecastResult(point=np.asarray(out.forecast), quantiles=np.asarray(out.quantiles))

@@ -13,6 +13,13 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from callcenter_lab.backtest import run_backtest
+from callcenter_lab.events import (
+    event_multipliers,
+    events_to_covariates,
+    forecast_with_events,
+    with_event_adjustment,
+)
+from callcenter_lab.events_ui import MODE_LABELS, events_panel, mode_selector, render_comparison
 from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
 from callcenter_lab.roster_ui import render_roster_tab
@@ -145,6 +152,7 @@ with st.sidebar:
 
 freq, season, interval_minutes = FREQUENCIES[freq_label]
 staffing_config = config_panel(interval_minutes)
+events = events_panel(DATA_DIR)
 how = "sum" if how_label.startswith("Somar") else "mean"
 fill = "zero" if fill_label.startswith("Preencher") else "interpolate"
 
@@ -175,10 +183,11 @@ tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios = st.tabs(
 # ------------------------------------------------------------- 2. previsão
 with tab_forecast:
     st.write("Prevê o volume de chamadas dos próximos intervalos, depois do fim da série.")
+    event_mode = mode_selector(events)
     if st.button("Prever", type="primary"):
         model = get_forecaster(backend)
         with st.spinner("Calculando..."):
-            result = forecast(model, series.to_numpy(), horizon)
+            result = forecast_with_events(model, series, horizon, freq, events, event_mode)
         future = pd.date_range(series.index[-1], periods=horizon + 1, freq=freq)[1:]
         point, lower, upper = (pd.Series(v, index=future)
                                for v in (result.point, result.lower, result.upper))
@@ -224,13 +233,29 @@ with tab_backtest:
                 "agregando valor. Um viés perto de zero significa que ele não erra sempre para o mesmo "
                 "lado. Se a cobertura ficar muito abaixo de 80%, a faixa está otimista."
             )
+            if events is not None:
+                kinds, event_matrix = events_to_covariates(events, series.index, drop_empty=True)
+                if kinds:
+                    with st.spinner("Comparando com e sem eventos..."):
+                        with_covariates = run_backtest(
+                            series, horizon,
+                            lambda h, n: forecast(model, h, n, covariates=event_matrix[:, : len(h) + n]), season,
+                        )
+                        adjusted_predictor = with_event_adjustment(
+                            lambda h, n: forecast(model, h, n), event_multipliers(events, series.index)
+                        )
+                        adjusted = run_backtest(series, horizon, adjusted_predictor, season)
+                    render_comparison(bt, with_covariates, adjusted, kinds)
+                else:
+                    st.info("Nenhum evento do calendário cai no período da série: nada a comparar.")
 
 # ---------------------------------------------------------------- 4. dimensionamento
 def run_forecast(steps: int):
     """The forecast for the next ``steps`` intervals as (point, lower, upper) series."""
     model = get_forecaster(backend)
+    mode = next((k for k, v in MODE_LABELS.items() if v == st.session_state.get("events_mode")), "adjust")
     with st.spinner("Prevendo..."):
-        result = forecast(model, series.to_numpy(), steps)
+        result = forecast_with_events(model, series, steps, freq, events, mode)
     future = pd.date_range(series.index[-1], periods=steps + 1, freq=freq)[1:]
     return tuple(pd.Series(v, index=future) for v in (result.point, result.lower, result.upper))
 
