@@ -61,6 +61,21 @@ class SeriesAHT:
         return self.series.reindex(index).fillna(self.default_seconds).to_numpy(dtype=float)
 
 
+@dataclass(frozen=True)
+class ScaledAHT:
+    """Another AHT model multiplied by a factor (e.g. 1.1 for "AHT 10% higher")."""
+
+    base: object  # anything with for_index(index)
+    factor: float
+
+    def __post_init__(self) -> None:
+        if self.factor <= 0:
+            raise ValueError("O fator de TMA deve ser maior que zero.")
+
+    def for_index(self, index: pd.DatetimeIndex) -> np.ndarray:
+        return self.base.for_index(index) * self.factor
+
+
 def load_aht_csv(path: str | Path | IO, default_seconds: float):
     """Read an AHT file (a path or an open file): columns ``timestamp, aht_seconds`` (per interval) or ``weekday, hour, aht_seconds`` (profile)."""
     df = pd.read_csv(path)

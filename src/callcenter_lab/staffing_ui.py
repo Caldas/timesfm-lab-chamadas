@@ -23,6 +23,7 @@ from .wfm import (
     simulate_replications,
     synthetic_aht,
 )
+from .wfm.tables import plan_table as display_table
 from .wfm.workload import SeriesAHT
 
 # widget key -> (StaffingConfig field or shrinkage component, default shown in the panel)
@@ -44,21 +45,6 @@ _KEYS = {
     "cfg_cost": 25.0,
     "cfg_shift": 8.0,
 }
-
-DISPLAY_COLUMNS = {
-    "calls": "Chamadas",
-    "aht_seconds": "TMA (s)",
-    "workload_erlangs": "Carga (Erlangs)",
-    "agents": "Agentes",
-    "service_level_pct": "Nível de serviço esperado (%)",
-    "asa_seconds": "Espera média (s)",
-    "occupancy_pct": "Ocupação (%)",
-    "prob_wait": "Prob. de espera",
-    "abandon_pct": "Abandono esperado (%)",
-    "scheduled": "Pessoas escaladas",
-    "cost": "Custo",
-}
-
 
 # --- configuration panel -------------------------------------------------------------------------
 def _config_to_state(config: StaffingConfig) -> None:
@@ -163,14 +149,6 @@ def config_panel(interval_minutes: int) -> StaffingConfig | None:
 
 
 # --- charts and tables ---------------------------------------------------------------------------
-def display_table(plan: pd.DataFrame) -> pd.DataFrame:
-    """The plan with Portuguese column names and sensible rounding, for the screen and the CSV."""
-    shown = plan[[c for c in DISPLAY_COLUMNS if c in plan.columns]].rename(columns=DISPLAY_COLUMNS)
-    return shown.round({"TMA (s)": 0, "Carga (Erlangs)": 2, "Nível de serviço esperado (%)": 1,
-                        "Espera média (s)": 1, "Ocupação (%)": 1, "Prob. de espera": 3,
-                        "Abandono esperado (%)": 1, "Chamadas": 1, "Custo": 2})
-
-
 def agents_figure(plan: pd.DataFrame, plan_range: pd.DataFrame | None) -> go.Figure:
     fig = go.Figure()
     if plan_range is not None:
