@@ -58,8 +58,9 @@ def metric_labels(at):
     return [m.label for m in at.metric]
 
 
-def test_app_has_the_six_tabs(app):
-    assert [t.label for t in app.tabs] == ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários", "📈 Acompanhamento do dia"]
+def test_app_has_the_seven_tabs(app):
+    assert [t.label for t in app.tabs] == ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários", "📈 Acompanhamento do dia",
+                                                  "🧩 Filas e habilidades (opcional)"]
 
 
 def test_roster_and_scenarios_ask_for_the_sizing_first(app):

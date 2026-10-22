@@ -1,5 +1,34 @@
 # Changelog
 
+## v2.2.0 — Opcionais: eventos, acompanhamento do dia e filas
+
+Três recursos **opcionais** (nada muda para quem não os usa) e uma correção importante.
+
+### Correção
+- **O intervalo padrão da interface era 15 minutos** nas versões v2.0.0 e v2.1.0 (ao acrescentar as opções de 10 e 20
+  minutos, a posição da opção de 30 minutos mudou e o padrão passou a ser a de 15). Com os dados de exemplo, de 30
+  minutos, a série saía com zeros alternados e o dimensionamento ficava errado até o usuário trocar o intervalo. Agora o
+  padrão é 30 minutos, escolhido pelo nome, e há um teste que garante isso.
+
+### Novidades
+- **Feriados e campanhas:** calendário de eventos em CSV (`data`, `fim`, `tipo`, `efeito`, `nome`), usado de duas
+  maneiras: **ajuste pelo efeito informado** (limpa o histórico do efeito e o reaplica nos dias futuros; o padrão) e
+  **covariáveis do TimesFM**. O teste de realidade compara a previsão sem eventos, com covariáveis e com ajuste. Nos
+  dados de exemplo e com o TimesFM 3.0 de verdade, as covariáveis quase não mudaram a previsão, enquanto o ajuste
+  derrubou o WAPE de 35% para 9% nos dias de campanha (com o efeito informado igual ao real).
+- **Acompanhamento do dia:** compara o plano da manhã com o realizado, avisa quando o dia sai da faixa 10–90%
+  (desvio acumulado e intervalos seguidos fora da faixa), re-prevê o resto do dia e projeta o total.
+- **Várias filas e habilidades:** carregamento com coluna de fila, dimensionamento de cada fila, simulador com
+  agentes de várias habilidades e roteamento (mais antiga na espera ou prioridade), e comparação de **equipes
+  separadas × equipe cruzada**. No exemplo de três filas, a equipe cruzada precisou de 15% menos horas de agente.
+- **Documentação:** guias `docs/10` (feriados e campanhas), `docs/11` (acompanhamento do dia) e `docs/12` (filas e
+  habilidades), novos termos no glossário e novos dados de exemplo (`synthetic-events`, `synthetic-queues`).
+
+### Limitações
+- O calendário de eventos é por dia; o ajuste supõe um multiplicador igual ao longo do dia.
+- A equipe cruzada trata os agentes como igualmente bons em todas as filas.
+- O acompanhamento do dia não se conecta ao sistema da central: você carrega o arquivo com o que já aconteceu.
+
 ## v2.1.0 — Escala de turnos, cenários e Excel
 
 Do dimensionamento à escala: o laboratório agora distribui as pessoas em turnos ao menor custo, compara

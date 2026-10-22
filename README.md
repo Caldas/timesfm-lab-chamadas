@@ -3,7 +3,7 @@
 Laboratório em português para **estudar e testar o [TimesFM 3.0](https://github.com/google-research/timesfm)**
 (modelo de fundação do Google Research para previsão de séries temporais) na **previsão do volume de
 chamadas de uma central de atendimento telefônico** e no **dimensionamento da equipe** (quantos agentes
-por intervalo, com Erlang C/A, shrinkage e simulação), na **escala de turnos** e em cenários "e se".
+por intervalo, com Erlang C/A, shrinkage e simulação), na **escala de turnos**, em cenários "e se" e, se você quiser, em **várias filas com habilidades cruzadas**.
 
 Foi pensado para quem **conhece muito de gestão de central telefônica e está começando em TI**: tudo é
 explicado passo a passo, e há uma interface web para mexer nos dados sem escrever código.
@@ -33,6 +33,7 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 | Usar a interface | [docs/04-usando-a-interface.md](docs/04-usando-a-interface.md) |
 | Dimensionar a equipe (Erlang, shrinkage, simulador) | [docs/07-guia-de-dimensionamento.md](docs/07-guia-de-dimensionamento.md) |
 | Escala de turnos e cenários "e se" | [docs/08-guia-de-escala-e-cenarios.md](docs/08-guia-de-escala-e-cenarios.md) |
+| Várias filas e habilidades (opcional) | [docs/12-filas-e-habilidades.md](docs/12-filas-e-habilidades.md) |
 | Acompanhamento do dia (alertas e re-previsão) | [docs/11-acompanhamento-do-dia.md](docs/11-acompanhamento-do-dia.md) |
 | Feriados e campanhas (calendário de eventos) | [docs/10-feriados-e-campanhas.md](docs/10-feriados-e-campanhas.md) |
 | Colunas dos dados | [docs/09-dicionario-de-dados.md](docs/09-dicionario-de-dados.md) |

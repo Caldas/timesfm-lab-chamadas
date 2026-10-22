@@ -77,6 +77,18 @@ REGISTRY: dict[str, Dataset] = {
         approx_size="~90 KB",
         downloadable=False,
     ),
+    "synthetic-queues": Dataset(
+        id="synthetic-queues",
+        title="Três filas sintéticas: vendas, suporte e cobrança (gerado)",
+        summary="Chamadas por 30 min de três filas com formatos e tamanhos diferentes, em um arquivo com coluna de fila.",
+        source_url="https://github.com/Caldas/timesfm-lab-chamadas",
+        license="MIT (gerado por este projeto)",
+        attribution="Gerado por scripts/gerar_amostra.py",
+        granularity="30 minutos",
+        period="12 semanas a partir de 2024-03-04",
+        approx_size="~380 KB",
+        downloadable=False,
+    ),
     "technion-bank": Dataset(
         id="technion-bank",
         title="Banco anônimo de Israel (Technion / Mandelbaum)",

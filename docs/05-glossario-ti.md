@@ -70,6 +70,11 @@ aparecem neste laboratório.
 | **Horário de corte** | No acompanhamento do dia, o primeiro intervalo que ainda não se conhece: o que vem antes é realizado, o que vem depois é previsão. |
 | **Desvio acumulado** | Quanto o realizado do dia está acima ou abaixo do planejado até agora, em %. |
 | **Re-previsão** | Nova previsão do resto do dia, usando o que já aconteceu hoje. |
+| **Fila (queue)** | Um fluxo de chamadas com a sua própria espera: vendas, suporte, cobrança. |
+| **Habilidade (skill)** | Qual fila um agente sabe atender. Um agente pode ter mais de uma. |
+| **Equipe cruzada** | Agentes que atendem várias filas. Precisa de menos agentes que equipes separadas para a mesma meta. |
+| **Pooling** | O efeito de juntar filas na mesma equipe: as sobras de uma cobrem as faltas das outras. |
+| **Roteamento** | A regra que decide qual chamada um agente livre atende (a que espera há mais tempo, ou a da fila prioritária). |
 | **Simulador** | Programa que reproduz a central chamada a chamada para conferir as fórmulas. |
 
 ## Atalhos úteis no Terminal

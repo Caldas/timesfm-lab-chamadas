@@ -175,6 +175,36 @@ jobs:
           assert workbook[:2] == b"PK" and len(workbook) > 5000
           print("ok:", roster.headcount, "people,", roster.status, "-", len(workbook), "bytes of Excel")
           EOF
+      - name: Queues with skills, events and day follow-up, from the bundle
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.python_bin }} - <<'EOF'
+          import pandas as pd
+
+          from callcenter_lab.events import events_to_covariates, load_events
+          from callcenter_lab.intraday import deviation_alerts, plan_vs_actual
+          from callcenter_lab.loading import split_by_queue
+          from callcenter_lab.synthetic import QUEUE_AHT_SECONDS
+          from callcenter_lab.wfm import StaffingConfig, compare_pooling
+
+          df = pd.read_csv("data/samples/chamadas_sinteticas_filas.csv")
+          queues = split_by_queue(df, "timestamp", "calls_offered", "queue", "30min")
+          day = {name: series.loc["2024-05-14"].iloc[16:40] for name, series in queues.items()}
+          result = compare_pooling(day, StaffingConfig(), QUEUE_AHT_SECONDS, n_replications=3, seed=1)
+          separate, pooled = result.summary.loc["Equipes separadas", "agent_hours"], result.summary.loc["Equipe cruzada", "agent_hours"]
+          assert pooled < separate, result.summary
+
+          events = load_events("data/samples/eventos/eventos_exemplo.csv")
+          kinds, covariates = events_to_covariates(events, pd.date_range("2024-05-24", periods=96, freq="30min"), drop_empty=True)
+          assert kinds == ["campanha"] and covariates.shape == (1, 96)
+
+          index = pd.date_range("2024-05-24 08:00", periods=4, freq="30min")
+          plan = pd.DataFrame({"point": 100.0, "lower": 80.0, "upper": 120.0}, index=index)
+          table = plan_vs_actual(plan, pd.Series([150.0, 160.0, 170.0, 100.0], index=index))
+          assert len(deviation_alerts(table, 3)) == 1
+          print("ok: pooling saves", round(100 * (separate - pooled) / separate), "% of agent hours;", kinds, "events;", len(table), "intervals followed")
+          EOF
 
   setup-bare-ubuntu:
     # A fresh Ubuntu with no Python at all: the script must offer/perform the apt install itself.

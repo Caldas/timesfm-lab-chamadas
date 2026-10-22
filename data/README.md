@@ -43,6 +43,7 @@ originais, que têm condições de uso diferentes (abaixo).
 |---|---|---|---|---|
 | `synthetic` | central fictícia (gerado), já incluído | 30 min | 12 semanas | ~80 KB |
 | `synthetic-service` | a mesma central, com dados de atendimento (gerado pelo simulador), já incluído | 30 min | 12 semanas | ~350 KB |
+| `synthetic-queues` | três filas (vendas, suporte, cobrança) em um arquivo com coluna de fila, já incluído | 30 min | 12 semanas | ~380 KB |
 | `synthetic-events` | a mesma central, com feriados e campanhas e o calendário de eventos, já incluído | 30 min | 12 semanas | ~90 KB |
 | `technion-bank` | banco de Israel | 30 min (agregado de chamadas individuais) | 1999 (12 meses) | ~12 MB baixados |
 | `hyndman-bank` | banco norte-americano | 5 min, dias úteis 7h–21h | mar–out/2003 | ~110 KB baixados |
@@ -54,6 +55,14 @@ originais, que têm condições de uso diferentes (abaixo).
 - Central aberta seg–sex 8h–20h e sáb 8h–14h, fechada aos domingos; pico no fim da manhã, pico menor
   à tarde, segundas mais cheias e sextas mais calmas.
 - Licença: MIT, como o resto do projeto (https://github.com/Caldas/timesfm-lab-chamadas). Serve para testar sem internet.
+
+### `synthetic-queues`: três filas sintéticas
+
+- Gerado por `scripts/gerar_amostra.py`: `samples/chamadas_sinteticas_filas.csv`, com as colunas `timestamp`, `queue`
+  (vendas, suporte, cobrança) e `calls_offered`. Cada fila tem o seu formato: vendas com pico no fim da manhã,
+  suporte com dois picos, cobrança com pico no fim da tarde.
+- O TMA de exemplo de cada fila é 240 s (vendas), 420 s (suporte) e 300 s (cobrança). Serve para estudar as
+  [filas e habilidades](../docs/12-filas-e-habilidades.md). Licença: MIT.
 
 ### `synthetic-events`: feriados e campanhas sintéticos
 

@@ -14,6 +14,13 @@ from .erlang import (
 )
 from .export import build_workbook
 from .plan import build_plan, build_plan_range
+from .queues import (
+    PoolingComparison,
+    QueuePlans,
+    build_queue_plans,
+    compare_pooling,
+    pooled_plan,
+)
 from .scenarios import (
     SENSITIVITY_PARAMETERS,
     Scenario,
@@ -45,6 +52,15 @@ from .simulator import (
     simulate,
     simulate_replications,
 )
+from .skills import (
+    AgentGroup,
+    QueueSpec,
+    SkillsReplications,
+    SkillsResult,
+    overall_by_queue,
+    simulate_skills,
+    simulate_skills_replications,
+)
 from .workload import (
     ConstantAHT,
     ProfileAHT,
@@ -61,8 +77,12 @@ __all__ = [
     "PRESET_LABELS",
     "SENSITIVITY_PARAMETERS",
     "VALID_INTERVALS",
+    "AgentGroup",
     "ConstantAHT",
+    "PoolingComparison",
     "ProfileAHT",
+    "QueuePlans",
+    "QueueSpec",
     "ReplicationResult",
     "Roster",
     "RosterRules",
@@ -72,12 +92,16 @@ __all__ = [
     "ShiftTemplate",
     "ShrinkageConfig",
     "SimulationResult",
+    "SkillsReplications",
+    "SkillsResult",
     "StaffingConfig",
     "apply_scenario",
     "asa",
     "build_plan",
     "build_plan_range",
+    "build_queue_plans",
     "build_workbook",
+    "compare_pooling",
     "daily_summary",
     "erlang_a",
     "erlang_b",
@@ -90,7 +114,9 @@ __all__ = [
     "load_aht_csv",
     "occupancy",
     "optimize_roster",
+    "overall_by_queue",
     "overall_metrics",
+    "pooled_plan",
     "preset",
     "required_agents",
     "required_agents_erlang_a",
@@ -102,6 +128,8 @@ __all__ = [
     "shrinkage_from_hours",
     "simulate",
     "simulate_replications",
+    "simulate_skills",
+    "simulate_skills_replications",
     "size_staffing",
     "synthetic_aht",
     "workload_erlangs",

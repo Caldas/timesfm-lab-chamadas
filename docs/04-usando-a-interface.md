@@ -129,6 +129,12 @@ acumulado e intervalos seguidos fora da faixa) e **re-prevê o resto do dia**, p
 você escolhe o horário de corte e vê se re-prever teria ajudado. Veja o
 [guia do acompanhamento do dia](11-acompanhamento-do-dia.md).
 
+## Aba "Filas e habilidades" (opcional)
+
+Desligada até você marcar **Ativar filas e habilidades**. Para arquivos com **várias filas** (uma coluna de fila):
+dimensiona cada fila com a sua equipe e **compara** equipes separadas com uma equipe cruzada (os mesmos agentes
+atendem todas as filas), medindo a diferença pelo simulador. Veja o [guia de filas e habilidades](12-filas-e-habilidades.md).
+
 ## Baixar os resultados
 
 Cada tabela tem um botão de **CSV**. O botão **Baixar tudo em Excel (.xlsx)** (nas abas Dimensionamento, Escala e

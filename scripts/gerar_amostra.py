@@ -4,6 +4,7 @@ from pathlib import Path
 
 from callcenter_lab.synthetic import (
     make_synthetic_calls,
+    make_synthetic_calls_by_queue,
     make_synthetic_calls_with_events,
     make_synthetic_events,
 )
@@ -33,3 +34,7 @@ if __name__ == "__main__":
     (SAMPLES / "eventos").mkdir(exist_ok=True)
     make_synthetic_events().to_csv(SAMPLES / "eventos" / "eventos_exemplo.csv", index=False)
     print(f"Gerado: {SAMPLES / 'chamadas_sinteticas_eventos.csv'} e {SAMPLES / 'eventos' / 'eventos_exemplo.csv'}")
+
+    # Three queues (sales, support, collections) in one file, with a "queue" column.
+    make_synthetic_calls_by_queue().to_csv(SAMPLES / "chamadas_sinteticas_filas.csv", index=False)
+    print(f"Gerado: {SAMPLES / 'chamadas_sinteticas_filas.csv'}")

@@ -21,8 +21,15 @@ from callcenter_lab.events import (
 )
 from callcenter_lab.events_ui import MODE_LABELS, events_panel, mode_selector, render_comparison
 from callcenter_lab.intraday_ui import render_followup_tab
-from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
+from callcenter_lab.loading import (
+    detect_columns,
+    detect_queue_column,
+    load_csv,
+    prepare_series,
+    resample_series,
+)
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
+from callcenter_lab.queues_ui import render_queues_tab
 from callcenter_lab.roster_ui import render_roster_tab
 from callcenter_lab.scenarios_ui import render_scenarios_tab
 from callcenter_lab.staffing_ui import config_panel, render_staffing_tab
@@ -122,6 +129,8 @@ except Exception as exc:  # noqa: BLE001 - show any read problem to the user
     st.error(f"Não consegui ler o arquivo: {exc}")
     st.stop()
 
+raw_df = df  # before any queue filter: the optional "Filas e habilidades" tab needs every queue
+
 with st.sidebar:
     guess_date, guess_value = detect_columns(df)
     cols = list(df.columns)
@@ -161,6 +170,12 @@ events = events_panel(DATA_DIR)
 how = "sum" if how_label.startswith("Somar") else "mean"
 fill = "zero" if fill_label.startswith("Preencher") else "interpolate"
 
+queue_column = detect_queue_column(raw_df, date_col, value_col)
+if queue_column and filter_col == "(nenhum)":
+    st.info(f"Este arquivo tem várias filas (coluna '{queue_column}'). Sem filtro, os valores do mesmo horário são "
+            "tirados pela **média**. Escolha uma fila em *Filtrar por* na barra lateral, ou use a aba "
+            "*Filas e habilidades* para dimensionar todas.")
+
 try:
     series = resample_series(prepare_series(df, date_col, value_col), freq, how, fill)
 except Exception as exc:  # noqa: BLE001
@@ -181,8 +196,9 @@ if chosen_backend == "torch" and choose_device() == "cpu":
     st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon ou numa GPU "
             "NVIDIA. Para acelerar, reduza o histórico e o número de intervalos na barra lateral.")
 
-tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios, tab_followup = st.tabs(
-    ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários", "📈 Acompanhamento do dia"]
+(tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios, tab_followup, tab_queues) = st.tabs(
+    ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários",
+     "📈 Acompanhamento do dia", "🧩 Filas e habilidades (opcional)"]
 )
 
 # ------------------------------------------------------------- 2. previsão
@@ -277,3 +293,8 @@ with tab_scenarios:
 with tab_followup:
     followup_mode = next((k for k, v in MODE_LABELS.items() if v == st.session_state.get("events_mode")), "adjust")
     render_followup_tab(series, freq, lambda: get_forecaster(backend), events, followup_mode)
+
+with tab_queues:
+    queues_mode = next((k for k, v in MODE_LABELS.items() if v == st.session_state.get("events_mode")), "adjust")
+    render_queues_tab(raw_df, date_col, value_col, freq, how, fill, staffing_config, max_history, horizon,
+                      lambda: get_forecaster(backend), events, queues_mode)

@@ -70,3 +70,35 @@ def make_synthetic_calls_with_events(
         multiplier = 1.0 if np.isnan(event.effect) else float(event.effect)
         rate = np.where((days >= event.start) & (days <= event.end), rate * multiplier, rate)
     return pd.DataFrame({"timestamp": index, "calls_offered": rng.poisson(rate)})
+
+
+# Average handling time of each example queue, in seconds (used by the examples and the docs).
+QUEUE_AHT_SECONDS = {"vendas": 240.0, "suporte": 420.0, "cobrança": 300.0}
+
+
+def _queue_rates(index: pd.DatetimeIndex) -> dict[str, np.ndarray]:
+    """Expected calls per 30 minutes for three queues with different shapes and sizes."""
+    hour = (index.hour + index.minute / 60).to_numpy()
+    weekday = index.day_of_week.to_numpy()
+    is_open = ((weekday < 5) & (hour >= 8) & (hour < 20)) | ((weekday == 5) & (hour >= 8) & (hour < 14))
+    gate = _DAY_FACTOR[weekday] * is_open
+    return {
+        "vendas": 0.6 * (30 + 90 * np.exp(-((hour - 10.5) ** 2) / 4)) * gate,
+        "suporte": 0.9 * (25 + 45 * np.exp(-((hour - 10) ** 2) / 8) + 40 * np.exp(-((hour - 15) ** 2) / 8)) * gate,
+        "cobrança": 0.5 * (15 + 70 * np.exp(-((hour - 16) ** 2) / 3)) * gate,
+    }
+
+
+def make_synthetic_calls_by_queue(weeks: int = 12, start: str = "2024-03-04", seed: int = 42) -> pd.DataFrame:
+    """Calls offered per 30 minutes for three queues (sales, support, collections).
+
+    Columns: ``timestamp``, ``queue`` and ``calls_offered``. Each queue has its own shape: sales peak late in the
+    morning, support has two peaks and collections peak in the late afternoon.
+    """
+    rng = np.random.default_rng(seed)
+    index = _grid(weeks, start)
+    frames = [
+        pd.DataFrame({"timestamp": index, "queue": name, "calls_offered": rng.poisson(rate)})
+        for name, rate in _queue_rates(index).items()
+    ]
+    return pd.concat(frames, ignore_index=True)
