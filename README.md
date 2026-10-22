@@ -2,7 +2,8 @@
 
 Laboratório em português para **estudar e testar o [TimesFM 3.0](https://github.com/google-research/timesfm)**
 (modelo de fundação do Google Research para previsão de séries temporais) na **previsão do volume de
-chamadas de uma central de atendimento telefônico**.
+chamadas de uma central de atendimento telefônico** e no **dimensionamento da equipe** (quantos agentes
+por intervalo, com Erlang C/A, shrinkage e simulação).
 
 Foi pensado para quem **conhece muito de gestão de central telefônica e está começando em TI**: tudo é
 explicado passo a passo, e há uma interface web para mexer nos dados sem escrever código.
@@ -17,7 +18,9 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 3. Abrir uma interface no navegador, carregar o volume de chamadas por intervalo e ver a previsão.
 4. Fazer um **teste de realidade**: esconder o final da série, prever e comparar com o que de fato
    aconteceu (WAPE, viés, cobertura), contra a regra simples "mesma semana anterior".
-5. Abrir notebooks que explicam, em pequenos passos, o que o código faz.
+5. **Dimensionar a equipe**: do volume previsto, do TMA e da meta de nível de serviço (configuráveis)
+   aos agentes por intervalo e às pessoas escaladas, conferindo o resultado em um **simulador** de central.
+6. Abrir notebooks que explicam, em pequenos passos, o que o código faz.
 
 ## Comece aqui
 
@@ -27,6 +30,8 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 | Instalar (escolha seu sistema) | [docs/01-instalar.md](docs/01-instalar.md): [Mac](docs/01-instalar-mac.md) · [Ubuntu](docs/01-instalar-ubuntu.md) · [Windows](docs/01-instalar-windows.md) |
 | Baixar datasets de chamadas | [docs/03-baixar-datasets.md](docs/03-baixar-datasets.md) e [data/README.md](data/README.md) |
 | Usar a interface | [docs/04-usando-a-interface.md](docs/04-usando-a-interface.md) |
+| Dimensionar a equipe (Erlang, shrinkage, simulador) | [docs/07-guia-de-dimensionamento.md](docs/07-guia-de-dimensionamento.md) |
+| Colunas dos dados | [docs/09-dicionario-de-dados.md](docs/09-dicionario-de-dados.md) |
 | Dúvidas de TI e de call center | [docs/05-glossario-ti.md](docs/05-glossario-ti.md) e [docs/06-problemas-comuns.md](docs/06-problemas-comuns.md) |
 
 Resumo rápido (depois de ler o guia do seu sistema):
@@ -81,7 +86,8 @@ respostas simuladas, para não depender de sites de terceiros).
 ## Estrutura
 
 ```
-src/callcenter_lab/   código: interface Streamlit (app.py), loading, metrics, model, backtest, datasets, synthetic
+src/callcenter_lab/   código: interface (app.py), loading, metrics, model, backtest, datasets, synthetic
+src/callcenter_lab/wfm/  dimensionamento: config, workload (TMA), erlang, shrinkage, simulator, plan
 notebooks/            notebooks didáticos
 data/samples/         dado de exemplo (sintético)
 data/README.md        datasets públicos: fontes, licenças e condições de uso

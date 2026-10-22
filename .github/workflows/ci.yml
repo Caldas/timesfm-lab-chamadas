@@ -140,6 +140,23 @@ jobs:
           assert any(o.endswith("samples/chamadas_sinteticas.csv") for o in options), options
           print("ok:", options)
           EOF
+      - name: Size a staffing plan and validate it by simulation, from the bundle
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.python_bin }} - <<'EOF'
+          import pandas as pd
+          from callcenter_lab.wfm import StaffingConfig, build_plan, simulate_replications
+
+          df = pd.read_csv("data/samples/chamadas_sinteticas.csv", parse_dates=["timestamp"])
+          day = df.set_index("timestamp")["calls_offered"].astype(float).loc["2024-05-17"]
+          plan = build_plan(day, StaffingConfig())
+          assert plan["agents"].max() > 0
+          sim = simulate_replications(
+              plan["calls"].to_numpy(), plan["agents"].to_numpy(), plan["aht_seconds"].to_numpy(), 30, n_replications=3
+          )
+          print("ok:", int(plan["agents"].max()), "agents,", round(sim.overall["service_level_pct"][0], 1), "% simulated")
+          EOF
 
   setup-bare-ubuntu:
     # A fresh Ubuntu with no Python at all: the script must offer/perform the apt install itself.

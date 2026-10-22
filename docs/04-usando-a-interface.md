@@ -60,6 +60,38 @@ Como ler os números:
 Se o trecho escondido não tiver chamadas (por exemplo, só domingo, com a central fechada), os
 percentuais aparecem como "n/d": escolha outro horizonte.
 
+## Aba "Dimensionamento"
+
+Transforma o volume de chamadas em **quantos agentes cada intervalo precisa**. A explicação da conta está no
+[guia de dimensionamento](07-guia-de-dimensionamento.md); aqui, o passo a passo da tela.
+
+Na barra lateral, **3. Dimensionamento (configuração)** reúne os parâmetros:
+
+| Parâmetro | Para que serve |
+|---|---|
+| Exemplo para começar | Preenche a meta com um exemplo (80% em 20 s ou 90% em 30 s). São exemplos editáveis |
+| Meta de nível de serviço | X% das chamadas atendidas em até Y segundos |
+| Ocupação máxima | Teto de ocupação dos agentes |
+| Limitar a espera média (ASA) | Opcional |
+| Clientes desistem da fila | Liga o Erlang A e pede a paciência média |
+| TMA padrão | Tempo médio de atendimento usado quando não há outro |
+| Shrinkage | Pausas, treinamento, absenteísmo, férias e outros (em %) |
+| Calcular custo | Custo por hora de uma pessoa escalada (opcional) |
+| Horas pagas por dia | Para converter horas em pessoas (FTE) |
+
+A configuração pode ser salva em um arquivo JSON e carregada depois. O **intervalo** vem da escolha em
+*2. Parâmetros* (de 5 a 60 minutos para dimensionar).
+
+Na aba, escolha o **volume** (previsão do TimesFM ou últimos intervalos do histórico) e o **TMA** (constante,
+exemplo sintético ou arquivo CSV) e clique em **Dimensionar**. Você vê:
+
+- o pico de agentes e de pessoas escaladas, o nível de serviço esperado e o custo;
+- o gráfico de agentes por intervalo, com a **faixa de volume** (cenários 10% e 90% da previsão);
+- os gráficos de nível de serviço e de ocupação contra a meta e o teto;
+- a tabela por intervalo e o resumo por dia (horas, FTE), com download em CSV;
+- **Validar no simulador**: simula a central com essa equipe e mostra o nível de serviço de verdade, com margem
+  de erro.
+
 ## Experimentos para fazer
 
 1. Compare previsões de 48, 96 e 336 intervalos (30 minutos). O erro cresce com o horizonte?
@@ -68,3 +100,5 @@ percentuais aparecem como "n/d": escolha outro horizonte.
    Nos picos? Nas segundas? Em dias atípicos?
 4. Troque "30 minutos" por "Hora" e veja o que muda no WAPE.
 5. No `nyc-311`, que opera 24 horas, compare o erro de fins de semana com o de dias úteis.
+6. No Dimensionamento, suba a meta de 80% para 95%: quantos agentes a mais por intervalo? E se o TMA subir 10%?
+7. Ligue "Clientes desistem da fila" com paciência de 120 s: a equipe diminui? Confira no simulador.

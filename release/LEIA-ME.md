@@ -20,6 +20,7 @@ faltar o Python, ele pergunta antes de instalar.
 - **Mac:** na primeira vez, clique com o botão direito no arquivo, *Abrir*, e confirme em *Abrir*.
 
 Depois de abrir a interface, escolha `chamadas_sinteticas.csv` na barra lateral e clique em **Prever**.
+Para dimensionar a equipe, use a aba **Dimensionamento** (guia: `docs/07-guia-de-dimensionamento.md`).
 
 ## O que tem aqui
 

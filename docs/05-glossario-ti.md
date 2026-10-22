@@ -50,6 +50,15 @@ aparecem neste laboratório.
 | **Viés** | Se a previsão tende a errar para mais (+) ou para menos (−) no total. |
 | **Backtest (teste de realidade)** | Esconder o final do histórico, prever, e comparar com o que aconteceu. |
 | **Zero-shot** | O modelo prevê uma série que nunca viu, sem treinamento. |
+| **Erlang** | Unidade de carga: 1 Erlang = um agente ocupado o tempo todo. Carga = chamadas × TMA ÷ duração do intervalo. |
+| **Erlang C / Erlang A** | Fórmulas que dizem quantos agentes uma carga exige para uma meta de nível de serviço. O Erlang C supõe que ninguém desiste; o Erlang A considera clientes que desligam. |
+| **Ocupação** | Parte do tempo em que o agente está atendendo (carga ÷ agentes). Alta demais cansa a equipe. |
+| **ASA (espera média)** | Tempo médio que uma chamada espera até ser atendida. |
+| **Shrinkage** | Parte do tempo pago em que o agente não atende (pausas, treinamento, faltas, férias). |
+| **Pessoas escaladas** | Agentes necessários ÷ (1 − shrinkage), arredondado para cima. |
+| **FTE** | Pessoa equivalente de tempo integral: horas escaladas ÷ horas pagas por dia de uma pessoa. |
+| **Escala** | Distribuição das pessoas em turnos para cobrir o dimensionamento (chega na versão 2.1). |
+| **Simulador** | Programa que reproduz a central chamada a chamada para conferir as fórmulas. |
 
 ## Atalhos úteis no Terminal
 
