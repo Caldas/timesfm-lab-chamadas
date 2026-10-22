@@ -22,7 +22,7 @@ def make_synthetic_calls(
     # Drop the last (closed) Sunday so the series ends on a Saturday with calls in it.
     index = pd.date_range(start, periods=weeks * 7 * 48 - 48, freq="30min")
     hour = (index.hour + index.minute / 60).to_numpy()
-    weekday = index.dayofweek.to_numpy()
+    weekday = index.day_of_week.to_numpy()
 
     open_weekday = (weekday < 5) & (hour >= 8) & (hour < 20)
     open_saturday = (weekday == 5) & (hour >= 8) & (hour < 14)

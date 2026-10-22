@@ -53,11 +53,11 @@ def test_choose_backend_validation():
 def test_synthetic_calls_follow_opening_hours():
     df = make_synthetic_calls(weeks=2)
     stamps = df["timestamp"]
-    sunday = df[stamps.dt.dayofweek == 6]
+    sunday = df[stamps.dt.day_of_week == 6]
     night = df[stamps.dt.hour < 8]
     assert (sunday["calls_offered"] == 0).all()
     assert (night["calls_offered"] == 0).all()
-    assert df[stamps.dt.dayofweek == 0]["calls_offered"].max() > 0
+    assert df[stamps.dt.day_of_week == 0]["calls_offered"].max() > 0
 
 
 def test_run_backtest_with_fake_predictor_is_perfect():

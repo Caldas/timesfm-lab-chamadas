@@ -81,7 +81,7 @@ def shrinkage_for_index(index: pd.DatetimeIndex, table: pd.DataFrame | None, def
         return np.full(len(index), float(default_pct))
     lookup = {(int(r.weekday), int(r.hour)): float(r.shrinkage_pct) for r in table.itertuples()}
     return np.array(
-        [lookup.get((int(day), int(hour)), float(default_pct)) for day, hour in zip(index.dayofweek, index.hour)]
+        [lookup.get((int(day), int(hour)), float(default_pct)) for day, hour in zip(index.day_of_week, index.hour)]
     )
 
 
