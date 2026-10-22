@@ -38,8 +38,8 @@ python3 --version      # precisa ser 3.10 ou mais nova
 
 ```bash
 cd ~
-git clone https://github.com/Caldas/timesfm-lab-trafego.git
-cd timesfm-lab-trafego
+git clone https://github.com/Caldas/timesfm-lab-chamadas.git
+cd timesfm-lab-chamadas
 ```
 
 ## Passo 4 — Instalar tudo
@@ -90,7 +90,7 @@ Veja como usar em [04-usando-a-interface.md](04-usando-a-interface.md).
 ## GPU NVIDIA
 
 - Com `--gpu`, o programa usa a GPU automaticamente (`verificar_ambiente.py` mostra o nome da placa).
-- Para forçar a CPU mesmo com GPU: `TRAFEGO_DEVICE=cpu ./scripts/abrir_interface.sh`.
+- Para forçar a CPU mesmo com GPU: `CALLCENTER_LAB_DEVICE=cpu ./scripts/abrir_interface.sh`.
 - O uso de GPU depende do driver NVIDIA instalado e compatível com o CUDA do PyTorch.
 - Este modo ainda não foi testado numa placa real durante a criação do projeto; se der erro, volte
   ao modo CPU (rode `./scripts/setup_linux.sh` sem `--gpu` numa pasta nova ou apague `.venv` antes).

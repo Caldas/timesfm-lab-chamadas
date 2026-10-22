@@ -112,8 +112,8 @@ if ((-not $Reinstalar) -and (-not $missing)) {
     Invoke-Checked $venvPython @("-m", "pip", "install", "--upgrade", "pip")
     Invoke-Checked $venvPython @("-m", "pip", "install", "-r", "requirements\windows.txt")
 }
-if (Test-Runs $venvPython @("-c", "import trafego_lab")) {
-    Write-Host "[REUSO] Pacote trafego_lab ja instalado."
+if (Test-Runs $venvPython @("-c", "import callcenter_lab")) {
+    Write-Host "[REUSO] Pacote callcenter_lab ja instalado."
 } else {
     Invoke-Checked $venvPython @("-m", "pip", "install", "-e", ".", "--no-deps")
 }

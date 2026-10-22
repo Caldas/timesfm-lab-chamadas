@@ -2,7 +2,7 @@ import pytest
 
 torch = pytest.importorskip("torch")
 
-from trafego_lab.compat import ensure_rmsnorm, make_rmsnorm_class
+from callcenter_lab.compat import ensure_rmsnorm, make_rmsnorm_class
 
 
 @pytest.mark.skipif(not hasattr(torch.nn, "RMSNorm"), reason="needs native RMSNorm to compare")

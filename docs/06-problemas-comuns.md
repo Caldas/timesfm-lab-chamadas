@@ -181,10 +181,19 @@ Rode antes o `scripts\setup_windows.ps1` (veja [01-instalar-windows.md](01-insta
 - Tente de novo: o download recomeça de onde parou.
 - O modelo é baixado do Hugging Face para `~/.cache/huggingface/`.
 
-## `Falha no download` do Kaggle
+## `baixar_datasets.py` falha ou dá `Falha ao baixar`
 
+- Confira a internet. Em rede de empresa, o certificado de segurança pode bloquear o download.
+- Baixe um dataset de cada vez para ver o erro de cada um: `python scripts/baixar_datasets.py technion-bank`.
+- As fontes são sites de terceiros (Universidade de Berna, robjhyndman.com, NYC Open Data) e podem ficar
+  fora do ar por algumas horas: tente de novo mais tarde. O que já foi baixado fica guardado em `data/raw/`.
+- `python scripts/baixar_datasets.py --forcar` baixa tudo de novo se algum arquivo ficou corrompido.
+
+## `Falha no download` do Kaggle (`--kaggle`)
+
+- Instalou o cliente com `pip install kaggle`?
 - O token está em `~/.kaggle/kaggle.json` (no Windows, `C:\Users\SEU_USUARIO\.kaggle\kaggle.json`)?
-  Veja [03](03-baixar-dados-kaggle.md).
+  Veja [03](03-baixar-datasets.md).
 - Você abriu a página do dataset e aceitou os termos?
 - O nome "dono/dataset" está certo?
 

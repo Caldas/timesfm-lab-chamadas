@@ -1,6 +1,6 @@
 import pytest
 
-from trafego_lab.modelo import choose_device
+from callcenter_lab.model import choose_device
 
 
 def test_choose_device_explicit_values():
@@ -14,10 +14,10 @@ def test_choose_device_rejects_unknown():
 
 
 def test_choose_device_env_override(monkeypatch):
-    monkeypatch.setenv("TRAFEGO_DEVICE", "cpu")
+    monkeypatch.setenv("CALLCENTER_LAB_DEVICE", "cpu")
     assert choose_device("auto") == "cpu"
 
 
 def test_choose_device_auto_is_cpu_or_cuda(monkeypatch):
-    monkeypatch.delenv("TRAFEGO_DEVICE", raising=False)
+    monkeypatch.delenv("CALLCENTER_LAB_DEVICE", raising=False)
     assert choose_device("auto") in ("cpu", "cuda")

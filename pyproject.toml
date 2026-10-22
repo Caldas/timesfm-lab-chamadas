@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "trafego-lab"
+name = "callcenter-lab"
 version = "0.1.0"
-description = "Laboratório para estudar o TimesFM 3.0 com dados de tráfego"
+description = "Laboratório para estudar o TimesFM 3.0 na previsão de chamadas de call center"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

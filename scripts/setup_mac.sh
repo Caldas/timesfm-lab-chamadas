@@ -125,8 +125,8 @@ else
   "$VENV_PY" -m pip install --upgrade pip
   "$VENV_PY" -m pip install -r "$REQ"
 fi
-if "$VENV_PY" -c "import trafego_lab" >/dev/null 2>&1; then
-  echo "[REUSO] Pacote trafego_lab já instalado."
+if "$VENV_PY" -c "import callcenter_lab" >/dev/null 2>&1; then
+  echo "[REUSO] Pacote callcenter_lab já instalado."
 else
   "$VENV_PY" -m pip install -e . --no-deps
 fi

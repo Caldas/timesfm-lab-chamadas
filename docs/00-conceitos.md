@@ -1,42 +1,46 @@
 # 00 — Conceitos
 
-Você já conhece tráfego. Aqui traduzimos os termos de ciência de dados para o seu mundo.
+Você já conhece central de atendimento. Aqui traduzimos os termos de ciência de dados para o seu mundo.
 
 ## Série temporal
 
-Uma sequência de medições em intervalos regulares. Exemplo: o número de veículos que passam em um
-cruzamento a cada hora. É exatamente o que um contador de tráfego produz.
+Uma sequência de medições em intervalos regulares. Exemplo: o número de chamadas que a central recebe
+a cada 30 minutos. É exatamente o que o relatório de chamadas oferecidas por intervalo do seu sistema
+produz.
 
-Uma série de tráfego costuma ter:
+Uma série de chamadas costuma ter:
 
-- **Sazonalidade diária**: picos de manhã e no fim da tarde.
-- **Sazonalidade semanal**: dias úteis diferentes de sábado e domingo.
-- **Eventos**: feriados, obras, chuva, jogos de futebol.
-- **Ruído**: variação aleatória de uma hora para outra.
+- **Sazonalidade diária**: picos no fim da manhã e no meio da tarde, vale na hora do almoço.
+- **Sazonalidade semanal**: segunda-feira cheia, sexta e fim de semana mais calmos.
+- **Eventos**: feriados, campanhas, envio de boletos, falhas de serviço, dia seguinte a um feriado.
+- **Ruído**: variação aleatória de um intervalo para o outro, mesmo num dia "normal".
+- **Horário fechado**: intervalos com zero chamadas, porque a central não está aberta.
 
 ## Previsão (forecast)
 
-Dado o histórico até hoje, estimar os próximos valores. O **horizonte** é quantos passos à frente
-você quer prever. Se os dados são horários e o horizonte é 48, o modelo prevê as próximas 48 horas.
+Dado o histórico até agora, estimar o volume dos próximos intervalos. O **horizonte** é quantos
+intervalos à frente você quer prever. Com intervalos de 30 minutos, horizonte 48 = o próximo dia;
+336 = a próxima semana.
 
 ## Modelo de fundação
 
-A maioria dos modelos de previsão é treinada com os dados de **uma** série (o seu cruzamento) e só
-serve para ela. O **TimesFM** é diferente: foi treinado antes, pelo Google, com uma enorme quantidade
-de séries de vários assuntos. Por isso consegue prever uma série que **nunca viu**, sem treinar nada
-(*zero-shot*). Você entrega o histórico e recebe a previsão.
+A maioria dos modelos de previsão é treinada com os dados de **uma** série (a sua fila) e só serve para
+ela. O **TimesFM** é diferente: foi treinado antes, pelo Google, com uma enorme quantidade de séries de
+vários assuntos. Por isso consegue prever uma série que **nunca viu**, sem treinar nada (*zero-shot*).
+Você entrega o histórico e recebe a previsão.
 
-É como um engenheiro experiente que já viu milhares de cruzamentos e reconhece o padrão no seu.
+É como um analista experiente que já viu o volume de milhares de operações e reconhece o padrão na sua.
 
 ## Previsão pontual e quantis
 
 O modelo devolve duas coisas:
 
-- **Previsão pontual**: o valor mais provável em cada passo (a mediana).
+- **Previsão pontual**: o valor mais provável em cada intervalo (a mediana).
 - **Quantis**: uma faixa de incerteza. Aqui mostramos a faixa entre o quantil 10% e o 90%: o modelo
-  espera que o valor real caia dentro dela em cerca de 80% das vezes.
+  espera que o volume real caia dentro dela em cerca de 80% das vezes.
 
-Uma faixa estreita significa confiança; uma faixa larga, incerteza.
+Faixa estreita significa confiança; faixa larga, incerteza. Para o planejamento, a borda superior da
+faixa é um cenário de pico a considerar.
 
 ## Como saber se a previsão é boa: o teste de realidade (backtest)
 
@@ -47,15 +51,24 @@ Métricas usadas:
 
 | Métrica | O que significa |
 |---|---|
-| **MAE** | Erro médio absoluto, na mesma unidade dos dados (veículos/hora). "Em média, erramos 120 veículos por hora." |
-| **MAPE** | Erro médio em porcentagem. Ignora horas com contagem zero. |
+| **WAPE** | Erro total dividido pelo total de chamadas, em %. É a medida de acerto mais usada em call center: não se distorce com horários calmos ou fechados. "Errei 12% do volume." |
+| **Viés** | Se a previsão, no total, pediu **mais** chamadas do que chegaram (positivo: risco de sobra de agentes) ou **menos** (negativo: risco de falta). Perto de zero é o ideal. |
+| **MAE** | Erro médio absoluto, em chamadas por intervalo. "Em média, erramos 6 chamadas por intervalo." |
 | **Cobertura 10–90%** | Quanto do real ficou dentro da faixa. O ideal é perto de 80%. Muito menos: o modelo está otimista demais. |
-| **Repetir ciclo anterior** | Uma referência simples: repetir as últimas 24 horas (ou 7 dias). Se o TimesFM não ganha dessa regra simples, ele não está ajudando naquele caso. |
+| **Mesma semana anterior** | Uma referência simples: repetir o que aconteceu na mesma hora da semana passada. Se o TimesFM não ganha dessa regra simples, ele não está ajudando naquele caso. |
+
+## Onde isso entra no seu trabalho
+
+A previsão de volume é o primeiro passo do dimensionamento: com o volume previsto por intervalo, o
+tempo médio de atendimento (TMA) e o nível de serviço alvo, calcula-se quantos agentes são
+necessários (tipicamente com a fórmula de Erlang C). **Este laboratório só cobre a previsão de
+volume**; ele não calcula escalas nem agentes.
 
 ## Limites importantes
 
-- O modelo **não sabe** de eventos que não estão nos dados (acidente, obra, show). Nesta versão do
-  laboratório ele usa só o histórico da própria série.
-- Quanto mais regular o padrão, melhor a previsão.
-- É um laboratório de estudo, não uma ferramenta de decisão de engenharia.
+- O modelo **não sabe** de eventos que não estão nos dados (campanha, falha, feriado local). Nesta
+  versão ele usa só o histórico da própria série.
+- Quanto mais regular o padrão, melhor a previsão. Dias atípicos continuam difíceis.
+- Aqui só prevemos **chamadas recebidas**; abandono, TMA e nível de serviço ficam fora.
+- É um laboratório de estudo, não uma ferramenta de decisão. Valide antes de usar na operação.
 - Os pesos do TimesFM 3.0 têm licença **não comercial**.

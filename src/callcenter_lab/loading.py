@@ -1,4 +1,4 @@
-"""Reading and preparing traffic time series from CSV files."""
+"""Reading and preparing call-volume time series from CSV files."""
 
 from __future__ import annotations
 
@@ -7,7 +7,9 @@ from typing import IO
 import pandas as pd
 
 _DATE_HINTS = ("date", "time", "data", "hora", "timestamp", "datetime")
-_VALUE_HINTS = ("volume", "count", "traffic", "flow", "vehicles", "veiculos", "contagem", "value")
+_VALUE_HINTS = (
+    "calls", "offered", "chamadas", "ligacoes", "ligações", "volume", "count", "contagem", "value"
+)
 
 
 def load_csv(source: str | IO) -> pd.DataFrame:
@@ -65,18 +67,25 @@ def prepare_series(df: pd.DataFrame, date_col: str, value_col: str) -> pd.Series
     return series
 
 
-def resample_series(series: pd.Series, freq: str, how: str = "sum") -> pd.Series:
-    """Aggregate to a regular frequency (e.g. ``"h"``, ``"D"``) and fill small gaps.
+def resample_series(
+    series: pd.Series, freq: str, how: str = "sum", fill: str = "interpolate"
+) -> pd.Series:
+    """Aggregate to a regular frequency (e.g. ``"30min"``, ``"h"``, ``"D"``) and fill empty slots.
 
-    ``how`` is ``"sum"`` (counts) or ``"mean"`` (rates, speeds). Gaps are filled by linear
-    interpolation so the model sees a regular grid.
+    ``how`` is ``"sum"`` (counts of calls) or ``"mean"`` (rates, durations).
+    ``fill`` says what to do with intervals that have no record: ``"zero"`` for counts of calls
+    (a closed contact center has zero calls) or ``"interpolate"`` for gaps in a measurement.
     """
     if how not in ("sum", "mean"):
         raise ValueError("how deve ser 'sum' ou 'mean'.")
+    if fill not in ("zero", "interpolate"):
+        raise ValueError("fill deve ser 'zero' ou 'interpolate'.")
     grouped = series.resample(freq)
     if how == "sum":
-        # min_count=1 keeps empty buckets as NaN instead of turning them into 0
+        # min_count=1 keeps empty buckets as NaN so that ``fill`` decides what they become
         regular = grouped.sum(min_count=1)
     else:
         regular = grouped.mean()
+    if fill == "zero":
+        return regular.fillna(0.0)
     return regular.interpolate(limit_direction="both")

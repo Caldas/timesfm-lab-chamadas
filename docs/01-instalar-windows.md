@@ -45,7 +45,7 @@ caminho que pode quebrar a instalação em pastas fundas (erro `WinError 206`).
 
 ```powershell
 cd C:\
-git clone https://github.com/Caldas/timesfm-lab-trafego.git timesfm-lab
+git clone https://github.com/Caldas/timesfm-lab-chamadas.git timesfm-lab
 cd timesfm-lab
 ```
 
@@ -88,7 +88,7 @@ Veja como usar em [04-usando-a-interface.md](04-usando-a-interface.md).
 
 ## Ativar o ambiente (quando precisar)
 
-Para rodar comandos como `jupyter lab` ou `python scripts\baixar_kaggle.py`:
+Para rodar comandos como `jupyter lab` ou `python scripts\baixar_datasets.py`:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1

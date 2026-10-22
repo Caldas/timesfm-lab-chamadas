@@ -53,10 +53,10 @@ def choose_device(requested: str = "auto") -> str:
     """Return ``"cuda"`` or ``"cpu"`` for the PyTorch backend.
 
     ``auto`` uses an NVIDIA GPU when PyTorch can see one, otherwise the CPU. The environment
-    variable ``TRAFEGO_DEVICE`` (``cpu`` or ``cuda``) overrides ``auto``.
+    variable ``CALLCENTER_LAB_DEVICE`` (``cpu`` or ``cuda``) overrides ``auto``.
     """
     if requested == "auto":
-        requested = os.environ.get("TRAFEGO_DEVICE", "auto").lower()
+        requested = os.environ.get("CALLCENTER_LAB_DEVICE", "auto").lower()
     if requested in ("cpu", "cuda"):
         return requested
     if requested != "auto":

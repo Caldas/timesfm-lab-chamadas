@@ -52,8 +52,8 @@ O Python precisa ser 3.10 ou mais novo.
 
 ```bash
 cd ~/Documents
-git clone https://github.com/Caldas/timesfm-lab-trafego.git
-cd timesfm-lab-trafego
+git clone https://github.com/Caldas/timesfm-lab-chamadas.git
+cd timesfm-lab-chamadas
 ```
 
 Se o repositório estiver privado, peça ao dono para te convidar como colaboradora e entre na sua conta

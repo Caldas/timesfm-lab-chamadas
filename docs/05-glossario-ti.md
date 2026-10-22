@@ -1,4 +1,9 @@
-# 05 — Glossário de TI para quem está começando
+# 05 — Glossário
+
+Duas partes: termos de **TI** (para quem está começando) e termos de **central de atendimento** como
+aparecem neste laboratório.
+
+## Termos de TI
 
 | Termo | Em português simples |
 |---|---|
@@ -12,7 +17,7 @@
 | **Git** | Programa que guarda o histórico de um projeto e baixa/atualiza cópias dele. |
 | **GitHub** | Site onde o projeto fica hospedado. |
 | **Repositório (repo)** | A pasta do projeto, com todo o histórico. |
-| **Clone (`git clone`)** | Baixar uma cópia do repositório para o seu Mac. |
+| **Clone (`git clone`)** | Baixar uma cópia do repositório para o seu computador. |
 | **`git pull`** | Atualizar sua cópia com as novidades do GitHub. |
 | **Homebrew (`brew`)** | Instalador de programas para Mac, via Terminal. |
 | **`apt`** | Instalador de programas do Ubuntu (`sudo apt install nome`). `sudo` = "executar como administrador". |
@@ -26,8 +31,25 @@
 | **MLX** | Tecnologia da Apple para rodar modelos de IA com eficiência nos chips M1/M2/M3/M4. |
 | **CPU / GPU** | O processador comum / o processador gráfico, bom para cálculos de IA. |
 | **CUDA** | Tecnologia das placas de vídeo **NVIDIA** que acelera cálculos de IA. Só vale se você tiver uma placa NVIDIA. |
-| **Localhost** | O seu próprio computador. `http://localhost:8501` é um endereço que só existe no seu Mac. |
+| **Localhost** | O seu próprio computador. `http://localhost:8501` é um endereço que só existe no seu computador. |
 | **Erro / traceback** | Mensagem de problema. Leia a **última linha**, que costuma dizer o que houve. |
+
+## Termos de central de atendimento e previsão
+
+| Termo | Como aparece aqui |
+|---|---|
+| **Chamadas oferecidas (`calls_offered`)** | Chamadas que chegaram à central num intervalo, atendidas ou não. É a coluna que o laboratório prevê. |
+| **Intervalo** | O "balde" de tempo em que as chamadas são contadas: 5, 15 ou 30 minutos, hora ou dia. |
+| **Horizonte** | Quantos intervalos à frente a previsão cobre. |
+| **Sazonalidade** | Padrão que se repete: o mesmo pico de manhã todo dia, a segunda cheia toda semana. |
+| **TMA (tempo médio de atendimento)** | Duração média de cada chamada. Não é previsto aqui, mas junto com o volume dimensiona a equipe. |
+| **Nível de serviço** | Meta como "80% das chamadas atendidas em 20 segundos". Não é calculado aqui. |
+| **Erlang C** | Fórmula clássica que transforma volume previsto, TMA e nível de serviço em número de agentes. Fora do escopo deste laboratório. |
+| **Quantil (10%–90%)** | Limites da faixa de incerteza da previsão: o volume deve ficar entre eles em ~80% dos casos. |
+| **WAPE** | Erro total / total de chamadas, em %. A medida de acerto principal. |
+| **Viés** | Se a previsão tende a errar para mais (+) ou para menos (−) no total. |
+| **Backtest (teste de realidade)** | Esconder o final do histórico, prever, e comparar com o que aconteceu. |
+| **Zero-shot** | O modelo prevê uma série que nunca viu, sem treinamento. |
 
 ## Atalhos úteis no Terminal
 

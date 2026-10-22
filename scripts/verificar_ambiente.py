@@ -15,7 +15,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from trafego_lab.modelo import choose_backend, choose_device
+from callcenter_lab.model import choose_backend, choose_device
 
 OK, FAIL = "✅", "❌"
 SETUP_HINT = {
@@ -129,7 +129,7 @@ def main() -> int:
     if memory is not None:
         print(f"{OK if memory >= 8 else '⚠️ '} Memória: {memory:.0f} GB (recomendado: 8 GB ou mais)")
 
-    for module in ("numpy", "pandas", "streamlit", "plotly", "trafego_lab"):
+    for module in ("numpy", "pandas", "streamlit", "plotly", "callcenter_lab"):
         problems += not check_import(module, SETUP_HINT)
 
     backend = choose_backend("auto")
@@ -140,12 +140,12 @@ def main() -> int:
         problems += check_torch()
 
     if args.com_modelo and not problems:
-        from trafego_lab.amostra import make_synthetic_traffic
-        from trafego_lab.modelo import forecast, load_forecaster
+        from callcenter_lab.model import forecast, load_forecaster
+        from callcenter_lab.synthetic import make_synthetic_calls
 
         print("➡️  Carregando o TimesFM 3.0 (a primeira vez baixa os pesos)...")
         model = load_forecaster(backend)
-        history = make_synthetic_traffic(weeks=2)["vehicle_count"].to_numpy()
+        history = make_synthetic_calls(weeks=3)["calls_offered"].to_numpy()
         result = forecast(model, history, horizon=24)
         print(f"{OK} Previsão de 24 passos gerada. Primeiros valores: {result.point[:3].round(0)}")
 
