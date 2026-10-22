@@ -149,6 +149,18 @@ def main() -> int:
         result = forecast(model, history, horizon=24)
         print(f"{OK} Previsão de 24 passos gerada. Primeiros valores: {result.point[:3].round(0)}")
 
+        # The same forecast with the event calendar as covariates (each backend has its own code path for them).
+        import pandas as pd
+
+        from callcenter_lab.events import events_to_covariates, parse_events
+        from callcenter_lab.synthetic import make_synthetic_events
+
+        horizon = 24
+        index = pd.date_range("2024-03-04", periods=len(history) + horizon, freq="30min")
+        kinds, covariates = events_to_covariates(parse_events(make_synthetic_events()), index, drop_empty=True)
+        with_events = forecast(model, history, horizon, covariates=covariates)
+        print(f"{OK} Previsão com covariáveis ({', '.join(kinds)}) gerada: {len(with_events.point)} passos.")
+
     print(f"\n{OK} Tudo certo." if not problems else f"\n{FAIL} {problems} problema(s).")
     return 1 if problems else 0
 
