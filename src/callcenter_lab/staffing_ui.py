@@ -18,6 +18,7 @@ from .wfm import (
     StaffingConfig,
     build_plan,
     build_plan_range,
+    build_workbook,
     daily_summary,
     load_aht_csv,
     simulate_replications,
@@ -148,6 +149,22 @@ def config_panel(interval_minutes: int) -> StaffingConfig | None:
     return config
 
 
+def excel_download(key: str) -> None:
+    """Button that downloads every result computed so far (plan, roster, scenarios...) as one Excel file."""
+    saved = st.session_state.get("staffing")
+    if not saved:
+        return
+    data = build_workbook(
+        config=saved["config"], plan=saved["plan"], plan_range=saved["range"], roster=st.session_state.get("roster"),
+        scenarios=st.session_state.get("scenario_results"), sensitivity=st.session_state.get("sensitivity_results"),
+    )
+    st.download_button(
+        "Baixar tudo em Excel (.xlsx)", data, file_name="dimensionamento.xlsx", key=key,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        help="Uma planilha com o resumo, a configuração e cada resultado calculado até agora.",
+    )
+
+
 # --- charts and tables ---------------------------------------------------------------------------
 def agents_figure(plan: pd.DataFrame, plan_range: pd.DataFrame | None) -> go.Figure:
     fig = go.Figure()
@@ -232,8 +249,11 @@ def render_staffing_tab(
         except ValueError as exc:
             st.error(str(exc))
             return
-        st.session_state["staffing"] = {"plan": plan, "range": plan_range, "config": config}
-        st.session_state.pop("staffing_validation", None)
+        volumes = {"low": range_inputs[1], "expected": range_inputs[0], "high": range_inputs[2]} if range_inputs else {"expected": calls}
+        st.session_state["staffing"] = {"plan": plan, "range": plan_range, "config": config, "volumes": volumes, "aht": aht}
+        # results that depend on the previous plan are no longer valid
+        for key in ("staffing_validation", "roster", "roster_validation", "scenario_results", "sensitivity_results"):
+            st.session_state.pop(key, None)
 
     saved = st.session_state.get("staffing")
     if not saved:
@@ -264,6 +284,7 @@ def render_staffing_tab(
     st.dataframe(table, width="stretch")
     st.download_button("Baixar o dimensionamento (CSV)", table.rename_axis("timestamp").to_csv().encode(),
                        file_name="dimensionamento.csv")
+    excel_download("excel_staffing")
 
     st.subheader("Por dia")
     daily = daily_summary(plan, used.interval_minutes, used.shift_hours).rename(columns={

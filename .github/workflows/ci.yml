@@ -157,6 +157,24 @@ jobs:
           )
           print("ok:", int(plan["agents"].max()), "agents,", round(sim.overall["service_level_pct"][0], 1), "% simulated")
           EOF
+      - name: Generate a roster (MILP solver) and an Excel file, from the bundle
+        shell: bash
+        run: |
+          cd bundle-test/*/
+          ${{ matrix.python_bin }} - <<'EOF'
+          import pandas as pd
+          from callcenter_lab.wfm import StaffingConfig, build_plan, build_workbook, example_templates, optimize_roster
+
+          df = pd.read_csv("data/samples/chamadas_sinteticas.csv", parse_dates=["timestamp"])
+          day = df.set_index("timestamp")["calls_offered"].astype(float).loc["2024-05-17"]
+          config = StaffingConfig()
+          plan = build_plan(day, config)
+          roster = optimize_roster(plan["scheduled"], example_templates(), 30)
+          assert len(roster.shifts) > 0 and roster.coverage["shortfall"].sum() == 0, roster.summary()
+          workbook = build_workbook(config=config, plan=plan, roster=roster)
+          assert workbook[:2] == b"PK" and len(workbook) > 5000
+          print("ok:", roster.headcount, "people,", roster.status, "-", len(workbook), "bytes of Excel")
+          EOF
 
   setup-bare-ubuntu:
     # A fresh Ubuntu with no Python at all: the script must offer/perform the apt install itself.

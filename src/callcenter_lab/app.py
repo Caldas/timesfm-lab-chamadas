@@ -15,6 +15,8 @@ import streamlit as st
 from callcenter_lab.backtest import run_backtest
 from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
+from callcenter_lab.roster_ui import render_roster_tab
+from callcenter_lab.scenarios_ui import render_scenarios_tab
 from callcenter_lab.staffing_ui import config_panel, render_staffing_tab
 
 # Where the sample and downloaded datasets live (set by ``python -m callcenter_lab``).
@@ -166,7 +168,9 @@ if chosen_backend == "torch" and choose_device() == "cpu":
     st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon ou numa GPU "
             "NVIDIA. Para acelerar, reduza o histórico e o número de intervalos na barra lateral.")
 
-tab_forecast, tab_backtest, tab_staffing = st.tabs(["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento"])
+tab_forecast, tab_backtest, tab_staffing, tab_roster, tab_scenarios = st.tabs(
+    ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários"]
+)
 
 # ------------------------------------------------------------- 2. previsão
 with tab_forecast:
@@ -233,3 +237,9 @@ def run_forecast(steps: int):
 
 with tab_staffing:
     render_staffing_tab(series, freq, staffing_config, run_forecast, horizon)
+
+with tab_roster:
+    render_roster_tab()
+
+with tab_scenarios:
+    render_scenarios_tab()

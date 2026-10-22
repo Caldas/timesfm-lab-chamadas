@@ -257,10 +257,12 @@ def simulate_replications(
         out[f"{name}_ci"] = [_half_width(values[:, i]) for i in range(values.shape[1])]
     out["agents"] = runs[0]["agents"]
     per_run = [overall_metrics(run, warmup_intervals) for run in runs]
-    overall = {
-        name: (float(np.nanmean([m[name] for m in per_run])), _half_width(np.array([m[name] for m in per_run])))
-        for name in per_run[0]
-    }
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # a period without calls has no averages
+        overall = {
+            name: (float(np.nanmean([m[name] for m in per_run])), _half_width(np.array([m[name] for m in per_run])))
+            for name in per_run[0]
+        }
     return ReplicationResult(out, overall, n_replications)
 
 

@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 pytest.importorskip("streamlit")
+import streamlit as st
 from streamlit.testing.v1 import AppTest
 
 import callcenter_lab
@@ -27,6 +28,7 @@ class FakeModel:
 
 @pytest.fixture
 def app(monkeypatch):
+    st.cache_resource.clear()  # the app caches the model: do not reuse another test's stand-in
     monkeypatch.chdir(ROOT)  # the app looks for ./data
     monkeypatch.setattr(model_module, "load_forecaster", lambda backend="auto", **kwargs: FakeModel())
     return AppTest.from_file(APP, default_timeout=90).run()
@@ -46,7 +48,7 @@ def metric_labels(at):
 
 def test_app_loads_with_the_staffing_panel_and_tab(app):
     assert not app.exception
-    assert [t.label for t in app.tabs] == ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento"]
+    assert [t.label for t in app.tabs][:3] == ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento"]
     assert app.number_input(key="cfg_sl_pct").value == 80.0  # example default, editable
 
 
