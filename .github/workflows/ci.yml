@@ -136,7 +136,7 @@ jobs:
           from streamlit.testing.v1 import AppTest
           at = AppTest.from_file(str(Path(callcenter_lab.__file__).with_name("app.py")), default_timeout=60).run()
           assert not at.exception, at.exception
-          options = [str(o).replace("\\", "/") for o in at.selectbox[0].options]
+          options = [str(o).replace("\\", "/") for o in next(s for s in at.selectbox if s.label.endswith("escolher um arquivo")).options]
           assert any(o.endswith("samples/chamadas_sinteticas.csv") for o in options), options
           print("ok:", options)
           EOF
