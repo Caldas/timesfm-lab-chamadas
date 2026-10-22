@@ -57,7 +57,13 @@ aparecem neste laboratório.
 | **Shrinkage** | Parte do tempo pago em que o agente não atende (pausas, treinamento, faltas, férias). |
 | **Pessoas escaladas** | Agentes necessários ÷ (1 − shrinkage), arredondado para cima. |
 | **FTE** | Pessoa equivalente de tempo integral: horas escaladas ÷ horas pagas por dia de uma pessoa. |
-| **Escala** | Distribuição das pessoas em turnos para cobrir o dimensionamento (chega na versão 2.1). |
+| **Escala** | Distribuição das pessoas em turnos, em cada dia, para cobrir o dimensionamento ao menor custo. |
+| **Turno** | Período de trabalho com início e duração fixos (ex.: 08:00 às 16:00), com pausa de refeição opcional. |
+| **Headcount** | Quantas pessoas a equipe precisa ter, considerando o limite de dias trabalhados por semana. |
+| **Cobertura** | Pessoas no turno menos as que estão na pausa de refeição, em cada intervalo. |
+| **Falta e sobra** | Pessoas a menos ou a mais que a necessidade em um intervalo. A escala mostra as duas. |
+| **Cenário "e se"** | Uma versão do dimensionamento com algo diferente (volume, TMA, shrinkage ou meta) para comparar com a base. |
+| **Sensibilidade** | O efeito de mudar um parâmetro de cada vez (ex.: TMA +5%, +10%) no dimensionamento. |
 | **Simulador** | Programa que reproduz a central chamada a chamada para conferir as fórmulas. |
 
 ## Atalhos úteis no Terminal

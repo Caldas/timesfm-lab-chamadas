@@ -92,6 +92,35 @@ exemplo sintético ou arquivo CSV) e clique em **Dimensionar**. Você vê:
 - **Validar no simulador**: simula a central com essa equipe e mostra o nível de serviço de verdade, com margem
   de erro.
 
+## Aba "Escala"
+
+Transforma o dimensionamento em **turnos**: quantas pessoas em cada turno, em cada dia, ao menor custo. A conta
+está no [guia de escala e cenários](08-guia-de-escala-e-cenarios.md). Faça antes o dimensionamento.
+
+1. Edite a **tabela de turnos** (início, duração, dias, pausa de refeição, mínimo e máximo de pessoas, custo). Dá
+   para acrescentar e apagar linhas. Os turnos que vêm preenchidos são só exemplos.
+2. Defina o **máximo de dias por semana** de cada pessoa, o custo padrão por hora e, se quiser, o número de pessoas
+   disponíveis. Clique em **Gerar escala**.
+3. Veja as **pessoas necessárias** (headcount), o custo, os intervalos com **falta** e as horas de **sobra**, o
+   gráfico de cobertura contra a necessidade, os turnos por dia, as pausas e a cobertura por intervalo, com download
+   em CSV.
+4. **Validar a escala no simulador** mostra o nível de serviço que ela realmente entrega.
+
+Se o período do dimensionamento não tem necessidade de pessoas (por exemplo, só um domingo com a central fechada),
+a aba explica e não gera escala.
+
+## Aba "Cenários"
+
+Responde a perguntas "e se...". Edite a tabela de cenários (volume baixo/esperado/alto, fator de volume, fator de
+TMA, pontos de shrinkage, outra meta ou ocupação) e clique em **Comparar cenários**: a primeira linha é a
+referência e as outras mostram a diferença. Se já existe uma escala, a tabela mostra também como ela cobriria cada
+cenário. Em **Sensibilidade**, escolha um parâmetro e veja o efeito de variá-lo, um de cada vez.
+
+## Baixar os resultados
+
+Cada tabela tem um botão de **CSV**. O botão **Baixar tudo em Excel (.xlsx)** (nas abas Dimensionamento, Escala e
+Cenários) reúne em uma planilha tudo que foi calculado até ali.
+
 ## Experimentos para fazer
 
 1. Compare previsões de 48, 96 e 336 intervalos (30 minutos). O erro cresce com o horizonte?
@@ -102,3 +131,5 @@ exemplo sintético ou arquivo CSV) e clique em **Dimensionar**. Você vê:
 5. No `nyc-311`, que opera 24 horas, compare o erro de fins de semana com o de dias úteis.
 6. No Dimensionamento, suba a meta de 80% para 95%: quantos agentes a mais por intervalo? E se o TMA subir 10%?
 7. Ligue "Clientes desistem da fila" com paciência de 120 s: a equipe diminui? Confira no simulador.
+8. Na aba Escala, troque os turnos de 8 horas por turnos de 4 e 6 horas. A sobra diminui? E o custo?
+9. Na aba Cenários, compare o volume alto com a escala que você gerou: quantas horas de falta aparecem?

@@ -1,5 +1,30 @@
 # Changelog
 
+## v2.1.0 — Escala de turnos, cenários e Excel
+
+Do dimensionamento à escala: o laboratório agora distribui as pessoas em turnos ao menor custo, compara
+cenários "e se" e leva tudo para o Excel.
+
+### Novidades
+- **Aba Escala:** modelos de turno editáveis (início, duração, dias, pausa de refeição, mínimo e máximo de
+  pessoas, custo), escala ótima por programação inteira (solver HiGHS do `scipy`) com pausas de refeição
+  escalonadas, limite de dias por semana por pessoa, limite de pessoas disponíveis, cobertura contra necessidade
+  (falta e sobra por intervalo), headcount, custo e **validação no simulador**.
+- **Aba Cenários:** compara cenários lado a lado (volume baixo/esperado/alto, fatores de volume e de TMA,
+  pontos de shrinkage, outra meta ou ocupação), com custo e a diferença para a referência; se há uma escala, mostra
+  como ela cobriria cada cenário. **Sensibilidade** de um parâmetro de cada vez.
+- **Exportação:** botões de CSV em cada tabela e **planilha Excel** única (resumo, configuração,
+  dimensionamento por intervalo e por dia, faixa de volume, escala, cenários e sensibilidade).
+- **Documentação e notebook:** guia de escala e cenários (`docs/08`), novos termos no glossário e o notebook 05
+  (escala de turnos).
+- Novas dependências: `scipy` (solver da escala) e `openpyxl` (Excel). O instalador cuida delas.
+
+### Limitações
+- A escala é por **quantidade de pessoas**, não por pessoa: não atribui nomes nem trata preferências, férias
+  individuais, competências ou regras trabalhistas específicas.
+- Uma fila só, com agentes iguais: filas e habilidades ficam para a v2.2 (opcional).
+- Os turnos, o custo e o shrinkage de exemplo não são de nenhuma operação real.
+
 ## v2.0.0 — Dimensionamento por intervalo
 
 Além de prever o volume de chamadas, o laboratório agora **dimensiona a equipe**: do volume previsto e

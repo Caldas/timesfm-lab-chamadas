@@ -17,3 +17,6 @@ kaggle.json
 # release bundle built by scripts/montar_release.py
 dist/
 build/
+
+# Excel files written by the notebooks
+notebooks/*.xlsx

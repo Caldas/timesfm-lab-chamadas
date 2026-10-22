@@ -3,7 +3,7 @@
 Laboratório em português para **estudar e testar o [TimesFM 3.0](https://github.com/google-research/timesfm)**
 (modelo de fundação do Google Research para previsão de séries temporais) na **previsão do volume de
 chamadas de uma central de atendimento telefônico** e no **dimensionamento da equipe** (quantos agentes
-por intervalo, com Erlang C/A, shrinkage e simulação).
+por intervalo, com Erlang C/A, shrinkage e simulação), na **escala de turnos** e em cenários "e se".
 
 Foi pensado para quem **conhece muito de gestão de central telefônica e está começando em TI**: tudo é
 explicado passo a passo, e há uma interface web para mexer nos dados sem escrever código.
@@ -20,6 +20,7 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
    aconteceu (WAPE, viés, cobertura), contra a regra simples "mesma semana anterior".
 5. **Dimensionar a equipe**: do volume previsto, do TMA e da meta de nível de serviço (configuráveis)
    aos agentes por intervalo e às pessoas escaladas, conferindo o resultado em um **simulador** de central.
+   Depois, gerar a **escala de turnos** ao menor custo, comparar **cenários "e se"** e baixar tudo em **Excel**.
 6. Abrir notebooks que explicam, em pequenos passos, o que o código faz.
 
 ## Comece aqui
@@ -31,6 +32,7 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 | Baixar datasets de chamadas | [docs/03-baixar-datasets.md](docs/03-baixar-datasets.md) e [data/README.md](data/README.md) |
 | Usar a interface | [docs/04-usando-a-interface.md](docs/04-usando-a-interface.md) |
 | Dimensionar a equipe (Erlang, shrinkage, simulador) | [docs/07-guia-de-dimensionamento.md](docs/07-guia-de-dimensionamento.md) |
+| Escala de turnos e cenários "e se" | [docs/08-guia-de-escala-e-cenarios.md](docs/08-guia-de-escala-e-cenarios.md) |
 | Colunas dos dados | [docs/09-dicionario-de-dados.md](docs/09-dicionario-de-dados.md) |
 | Dúvidas de TI e de call center | [docs/05-glossario-ti.md](docs/05-glossario-ti.md) e [docs/06-problemas-comuns.md](docs/06-problemas-comuns.md) |
 
@@ -87,7 +89,8 @@ respostas simuladas, para não depender de sites de terceiros).
 
 ```
 src/callcenter_lab/   código: interface (app.py), loading, metrics, model, backtest, datasets, synthetic
-src/callcenter_lab/wfm/  dimensionamento: config, workload (TMA), erlang, shrinkage, simulator, plan
+src/callcenter_lab/wfm/  dimensionamento: config, workload (TMA), erlang, shrinkage, simulator, plan,
+                         scheduling (escala), scenarios (cenários), tables e export (Excel)
 notebooks/            notebooks didáticos
 data/samples/         dado de exemplo (sintético)
 data/README.md        datasets públicos: fontes, licenças e condições de uso
