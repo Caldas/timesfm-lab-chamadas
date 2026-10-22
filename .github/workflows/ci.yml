@@ -22,7 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install dependencies (no model download is needed for the tests)
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,app]"
       - name: Lint
         run: ruff check .
       - name: Tests

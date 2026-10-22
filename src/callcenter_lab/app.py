@@ -15,16 +15,19 @@ import streamlit as st
 from callcenter_lab.backtest import run_backtest
 from callcenter_lab.loading import detect_columns, load_csv, prepare_series, resample_series
 from callcenter_lab.model import choose_backend, choose_device, forecast, load_forecaster
+from callcenter_lab.staffing_ui import config_panel, render_staffing_tab
 
 # Where the sample and downloaded datasets live (set by ``python -m callcenter_lab``).
 DATA_DIR = Path(os.environ.get("CALLCENTER_LAB_DATA", Path.cwd() / "data"))
-# label -> (pandas frequency, length of one week in steps: the "same time last week" baseline)
+# label -> (pandas frequency, length of one week in steps for the "same time last week" baseline, minutes)
 FREQUENCIES = {
-    "5 minutos": ("5min", 12 * 24 * 7),
-    "15 minutos": ("15min", 4 * 24 * 7),
-    "30 minutos": ("30min", 2 * 24 * 7),
-    "Hora": ("h", 24 * 7),
-    "Dia": ("D", 7),
+    "5 minutos": ("5min", 12 * 24 * 7, 5),
+    "10 minutos": ("10min", 6 * 24 * 7, 10),
+    "15 minutos": ("15min", 4 * 24 * 7, 15),
+    "20 minutos": ("20min", 3 * 24 * 7, 20),
+    "30 minutos": ("30min", 2 * 24 * 7, 30),
+    "Hora": ("h", 24 * 7, 60),
+    "Dia": ("D", 7, 1440),
 }
 
 def fmt_pct(value: float, signed: bool = False) -> str:
@@ -116,7 +119,8 @@ with st.sidebar:
 
     # Some files mix several queues/sites; let the user pick one.
     filter_options = [
-        c for c in cols if c not in (date_col, value_col) and 1 < df[c].nunique() <= 20
+        c for c in cols
+        if c not in (date_col, value_col) and not pd.api.types.is_numeric_dtype(df[c]) and 1 < df[c].nunique() <= 20
     ]
     filter_col = st.selectbox("Filtrar por (opcional)", ["(nenhum)"] + filter_options,
                               help="Útil quando o arquivo tem várias filas, equipes ou unidades.")
@@ -137,7 +141,8 @@ with st.sidebar:
     backend = st.selectbox("Motor", ["auto", "mlx", "torch"],
                            help="auto = MLX no Mac Apple silicon; PyTorch nos demais")
 
-freq, season = FREQUENCIES[freq_label]
+freq, season, interval_minutes = FREQUENCIES[freq_label]
+staffing_config = config_panel(interval_minutes)
 how = "sum" if how_label.startswith("Somar") else "mean"
 fill = "zero" if fill_label.startswith("Preencher") else "interpolate"
 
@@ -161,7 +166,7 @@ if chosen_backend == "torch" and choose_device() == "cpu":
     st.info("Motor PyTorch (CPU): a previsão pode ser mais lenta que no Apple silicon ou numa GPU "
             "NVIDIA. Para acelerar, reduza o histórico e o número de intervalos na barra lateral.")
 
-tab_forecast, tab_backtest = st.tabs(["🔮 Previsão", "🧪 Teste de realidade"])
+tab_forecast, tab_backtest, tab_staffing = st.tabs(["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento"])
 
 # ------------------------------------------------------------- 2. previsão
 with tab_forecast:
@@ -215,3 +220,16 @@ with tab_backtest:
                 "agregando valor. Um viés perto de zero significa que ele não erra sempre para o mesmo "
                 "lado. Se a cobertura ficar muito abaixo de 80%, a faixa está otimista."
             )
+
+# ---------------------------------------------------------------- 4. dimensionamento
+def run_forecast(steps: int):
+    """The forecast for the next ``steps`` intervals as (point, lower, upper) series."""
+    model = get_forecaster(backend)
+    with st.spinner("Prevendo..."):
+        result = forecast(model, series.to_numpy(), steps)
+    future = pd.date_range(series.index[-1], periods=steps + 1, freq=freq)[1:]
+    return tuple(pd.Series(v, index=future) for v in (result.point, result.lower, result.upper))
+
+
+with tab_staffing:
+    render_staffing_tab(series, freq, staffing_config, run_forecast, horizon)

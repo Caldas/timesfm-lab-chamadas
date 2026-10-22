@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import IO
 
 import numpy as np
 import pandas as pd
@@ -60,8 +61,8 @@ class SeriesAHT:
         return self.series.reindex(index).fillna(self.default_seconds).to_numpy(dtype=float)
 
 
-def load_aht_csv(path: str | Path, default_seconds: float):
-    """Read an AHT file: columns ``timestamp, aht_seconds`` (per interval) or ``weekday, hour, aht_seconds`` (profile)."""
+def load_aht_csv(path: str | Path | IO, default_seconds: float):
+    """Read an AHT file (a path or an open file): columns ``timestamp, aht_seconds`` (per interval) or ``weekday, hour, aht_seconds`` (profile)."""
     df = pd.read_csv(path)
     if {"timestamp", "aht_seconds"} <= set(df.columns):
         series = pd.Series(df["aht_seconds"].to_numpy(dtype=float), index=pd.to_datetime(df["timestamp"]))
