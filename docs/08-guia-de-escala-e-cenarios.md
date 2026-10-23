@@ -147,7 +147,7 @@ dados de um laboratório de estudo.
 
 ## Limites
 
-- Uma fila só, com agentes iguais (filas e habilidades ficam para a v2.2, opcional).
+- A escala e os cenários tratam **uma fila só**, com agentes iguais. Várias filas e habilidades estão na aba opcional do [guia 12](12-filas-e-habilidades.md), que dimensiona e simula, mas não gera escala.
 - A escala é por **quantidade de pessoas**, não por pessoa.
 - Os turnos, o custo e o shrinkage de exemplo **não são referência** de nenhuma operação.
 - É um laboratório de estudo. Valide a escala antes de usá-la de verdade.

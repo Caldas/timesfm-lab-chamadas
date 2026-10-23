@@ -121,7 +121,7 @@ Erlang C prevê 60,7% de nível de serviço e a simulação (20 execuções) deu
 
 ## Limites
 
-- **Uma fila só**, com agentes iguais. Várias filas e habilidades ficam para uma versão futura (opcional).
+- Esta aba trata **uma fila só**, com agentes iguais. Para várias filas e habilidades, use a aba opcional descrita no [guia 12](12-filas-e-habilidades.md).
 - O Erlang supõe chegadas ao acaso (Poisson) e atendimento sem pressa. Dias com picos muito bruscos ou
   campanhas podem fugir disso: confira no simulador.
 - Os valores de exemplo (meta, ocupação, shrinkage, TMA) **não são referência** de nenhuma operação.

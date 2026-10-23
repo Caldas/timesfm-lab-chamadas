@@ -12,8 +12,8 @@ O navegador abre em `http://localhost:8501`.
 ### 1. Dados
 
 - **Enviar um CSV**: arraste um arquivo seu. Se não enviar nada, você escolhe um arquivo da lista
-  (`data/samples` e `data/raw`). O primeiro é sintético, para testar; os datasets públicos aparecem
-  depois de rodar `scripts/baixar_datasets.py` ([03](03-baixar-datasets.md)).
+  (`data/samples` e `data/raw`). Os de `data/samples` são sintéticos, para testar (volume, atendimento, eventos e
+  filas); os datasets públicos aparecem depois de rodar `scripts/baixar_datasets.py` ([03](03-baixar-datasets.md)).
 - **Coluna de data/hora** e **Coluna de chamadas**: a interface tenta adivinhar. Corrija se errar.
 - **Filtrar por (opcional)**: se o arquivo mistura várias filas, equipes ou unidades, escolha uma.
 
@@ -21,12 +21,16 @@ O navegador abre em `http://localhost:8501`.
 
 | Controle | Para que serve |
 |---|---|
-| **Intervalo** | Tamanho do intervalo da série: 5, 15 ou 30 minutos, hora ou dia. Os dados são agrupados nele. Use um intervalo igual ou maior que o do arquivo. |
+| **Intervalo** | Tamanho do intervalo da série: 5, 10, 15, 20 ou 30 minutos, hora ou dia (o padrão é **30 minutos**). Os dados são agrupados nele. Use um intervalo igual ou maior que o do arquivo. |
 | **Como agrupar** | *Somar* para chamadas recebidas. *Média* para métricas como TMA. |
 | **Intervalos sem registro** | *Preencher com zero* quando a central fecha (o normal para chamadas). *Interpolar* só para falhas de medição. |
 | **Quantos intervalos prever** | O horizonte. Com 30 minutos, 48 = um dia; 336 = uma semana. |
 | **Quanto histórico usar** | Quantos intervalos recentes o modelo enxerga. Com 30 minutos, 1344 = 4 semanas. |
 | **Motor** | Deixe em `auto`: usa MLX no Mac Apple silicon e PyTorch nos demais (na GPU NVIDIA, se houver; senão na CPU). |
+
+A interface tem sete abas: **Previsão**, **Teste de realidade**, **Dimensionamento**, **Escala**, **Cenários**,
+**Acompanhamento do dia** e **Filas e habilidades**. As duas últimas são opcionais, e o calendário de eventos
+(*4. Eventos*, na barra lateral) também.
 
 ## Área principal
 

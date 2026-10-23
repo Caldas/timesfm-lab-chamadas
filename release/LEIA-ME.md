@@ -32,7 +32,8 @@ wheels/         o laboratório empacotado (instalado pelo script de instalação
 requirements/   bibliotecas de cada sistema (usadas pelo script de instalação)
 docs/           guias em português (comece por docs/01-instalar.md e docs/00-conceitos.md)
 notebooks/      notebooks didáticos (jupyter lab)
-data/           dado de exemplo e README com as fontes e licenças dos datasets públicos
+data/           quatro arquivos de exemplo (volume, atendimento, eventos e filas) e README com as fontes
+                e licenças dos datasets públicos
 ```
 
 ## Datasets públicos de chamadas

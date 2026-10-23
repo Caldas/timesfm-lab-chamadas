@@ -3,7 +3,8 @@
 Laboratório em português para **estudar e testar o [TimesFM 3.0](https://github.com/google-research/timesfm)**
 (modelo de fundação do Google Research para previsão de séries temporais) na **previsão do volume de
 chamadas de uma central de atendimento telefônico** e no **dimensionamento da equipe** (quantos agentes
-por intervalo, com Erlang C/A, shrinkage e simulação), na **escala de turnos**, em cenários "e se" e, se você quiser, em **várias filas com habilidades cruzadas**.
+por intervalo, com Erlang C/A, shrinkage e simulação), na **escala de turnos**, em cenários "e se" e, se você quiser,
+em **feriados e campanhas**, no **acompanhamento do dia** e em **várias filas com habilidades cruzadas**.
 
 Foi pensado para quem **conhece muito de gestão de central telefônica e está começando em TI**: tudo é
 explicado passo a passo, e há uma interface web para mexer nos dados sem escrever código.
@@ -21,7 +22,9 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 5. **Dimensionar a equipe**: do volume previsto, do TMA e da meta de nível de serviço (configuráveis)
    aos agentes por intervalo e às pessoas escaladas, conferindo o resultado em um **simulador** de central.
    Depois, gerar a **escala de turnos** ao menor custo, comparar **cenários "e se"** e baixar tudo em **Excel**.
-6. Abrir notebooks que explicam, em pequenos passos, o que o código faz.
+6. Opcionalmente: informar **feriados e campanhas** num calendário, **acompanhar o dia** (previsto x realizado, alertas
+   e re-previsão) e dimensionar **várias filas**, comparando equipes separadas com uma equipe cruzada.
+7. Abrir notebooks que explicam, em pequenos passos, o que o código faz.
 
 ## Comece aqui
 
@@ -66,8 +69,11 @@ python scripts/baixar_datasets.py --lista                  # fontes e licenças
 | `hyndman-bank` | Central de um banco norte-americano, 2003 | 5 min |
 | `nyc-311` | Linha 311 de Nova York, 2016–2019 | 1 hora |
 
-O projeto também traz `chamadas_sinteticas.csv` (gerado) para testar sem internet. Fontes, licenças e
-condições de uso de cada dataset: [data/README.md](data/README.md).
+O projeto também traz, **já prontos e sem precisar de internet**, quatro arquivos sintéticos em `data/samples/`:
+`chamadas_sinteticas.csv` (volume), `chamadas_sinteticas_atendimento.csv` (com atendimento),
+`chamadas_sinteticas_eventos.csv` com o calendário `eventos/eventos_exemplo.csv` (feriados e campanhas) e
+`chamadas_sinteticas_filas.csv` (três filas). Fontes, licenças e condições de uso dos datasets públicos:
+[data/README.md](data/README.md).
 
 > **Plataformas suportadas:**
 >
@@ -82,25 +88,28 @@ condições de uso de cada dataset: [data/README.md](data/README.md).
 
 ## O que é testado automaticamente
 
-A cada alteração, o CI (GitHub Actions) roda os testes e o **script de instalação real** em Ubuntu,
-Windows, Mac Apple silicon e Mac Intel. O job manual "Real forecast" também baixa o modelo e gera
-uma previsão nos quatro sistemas. O que **não** é testado automaticamente: uso de GPU NVIDIA (`--gpu`),
+A cada alteração, o CI (GitHub Actions) roda os testes (Ubuntu, Windows e macOS), o **script de instalação real** e o
+**pacote enxuto** do release (descompactado, instalado, aberto e usado para dimensionar, simular, gerar escala e Excel,
+e para filas, eventos e acompanhamento do dia) em Ubuntu, Windows, Mac Apple silicon e Mac Intel. O job manual
+"Real forecast" também baixa o modelo e gera uma previsão nos quatro sistemas. O que **não** é testado automaticamente: uso de GPU NVIDIA (`--gpu`),
 Windows ARM64, Linux ARM e o download dos datasets a partir das fontes originais (os testes usam
 respostas simuladas, para não depender de sites de terceiros).
 
 ## Estrutura
 
 ```
-src/callcenter_lab/   código: interface (app.py), loading, metrics, model, backtest, datasets, synthetic
+src/callcenter_lab/   código: interface (app.py e as abas *_ui.py), loading, metrics, model, backtest, datasets,
+                      synthetic, events (feriados e campanhas) e intraday (acompanhamento do dia)
 src/callcenter_lab/wfm/  dimensionamento: config, workload (TMA), erlang, shrinkage, simulator, plan,
-                         scheduling (escala), scenarios (cenários), tables e export (Excel)
-notebooks/            notebooks didáticos
-data/samples/         dado de exemplo (sintético)
+                         scheduling (escala), scenarios (cenários), queues e skills (filas e habilidades),
+                         tables e export (Excel)
+notebooks/            notebooks didáticos (previsão, avaliação, Erlang, simulação e escala)
+data/samples/         dados de exemplo (sintéticos): volume, atendimento, eventos e filas
 data/README.md        datasets públicos: fontes, licenças e condições de uso
 docs/                 guias em português
 scripts/              instalação por sistema (setup_mac.sh, setup_linux.sh, setup_windows.ps1),
                       abrir a interface, verificar o ambiente e baixar datasets
-tests/                testes unitários básicos
+tests/                testes automatizados (unidade e interface)
 release/              texto do LEIA-ME do pacote; scripts/montar_release.py monta o release
 ```
 

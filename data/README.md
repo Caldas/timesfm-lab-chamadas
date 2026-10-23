@@ -13,10 +13,11 @@ atendidas, abandonos, TMA, espera e nível de serviço: veja o
 
 | Pasta | Conteúdo | Versionado? |
 |---|---|---|
-| `samples/` | `chamadas_sinteticas.csv`, gerado por `scripts/gerar_amostra.py` | Sim |
+| `samples/` | Quatro arquivos sintéticos, gerados por `scripts/gerar_amostra.py`: `chamadas_sinteticas.csv`, `chamadas_sinteticas_atendimento.csv`, `chamadas_sinteticas_eventos.csv` e `chamadas_sinteticas_filas.csv`; mais o calendário `samples/eventos/eventos_exemplo.csv` | Sim (e no pacote do release) |
 | `raw/<dataset>/` | Datasets públicos baixados por `scripts/baixar_datasets.py` | **Não** (está no `.gitignore`) |
 
-A interface lista automaticamente todos os `.csv` dessas duas pastas.
+A interface lista automaticamente todos os `.csv` dessas duas pastas (o calendário de eventos é escolhido à parte,
+em *4. Eventos*). O pacote do release já traz os quatro arquivos sintéticos: **não é preciso baixar nada para começar**.
 
 ## Baixar os datasets
 
