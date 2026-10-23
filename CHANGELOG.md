@@ -1,5 +1,15 @@
 # Changelog
 
+## v2.1.1 — Correção do intervalo padrão
+
+Versão só com uma correção; nada mais mudou em relação à v2.1.0.
+
+### Correção
+- **O intervalo padrão da interface era 15 minutos** (nas versões v2.0.0 e v2.1.0). Ao acrescentar as opções de 10 e
+  20 minutos, a posição da opção de 30 minutos mudou e o padrão passou a ser a de 15. Com os dados de exemplo, de 30
+  minutos, a série saía com zeros alternados e o dimensionamento ficava errado até o usuário trocar o intervalo. Agora o
+  padrão é 30 minutos, escolhido pelo nome, e há um teste que garante isso. A v2.2.0 já traz esta correção.
+
 ## v2.1.0 — Escala de turnos, cenários e Excel
 
 Do dimensionamento à escala: o laboratório agora distribui as pessoas em turnos ao menor custo, compara

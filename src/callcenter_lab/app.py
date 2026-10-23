@@ -31,6 +31,8 @@ FREQUENCIES = {
     "Hora": ("h", 24 * 7, 60),
     "Dia": ("D", 7, 1440),
 }
+# Chosen by name: a position in the dict silently changes when options are added (it did once).
+DEFAULT_INTERVAL = "30 minutos"
 
 def fmt_pct(value: float, signed: bool = False) -> str:
     """Format a percentage; ``n/d`` when it is undefined (e.g. no calls in the hidden period)."""
@@ -131,7 +133,7 @@ with st.sidebar:
         df = df[df[filter_col] == filter_value]
 
     st.header("2. Parâmetros")
-    freq_label = st.selectbox("Intervalo", list(FREQUENCIES), index=2)
+    freq_label = st.selectbox("Intervalo", list(FREQUENCIES), index=list(FREQUENCIES).index(DEFAULT_INTERVAL))
     how_label = st.radio("Como agrupar", ["Somar (chamadas)", "Média (ex.: TMA, taxa)"])
     fill_label = st.radio(
         "Intervalos sem registro",

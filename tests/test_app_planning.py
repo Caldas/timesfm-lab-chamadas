@@ -58,6 +58,11 @@ def metric_labels(at):
     return [m.label for m in at.metric]
 
 
+def test_default_interval_is_30_minutes(app):
+    # The sample data is 30 min; the default once drifted to 15 min when options were added to the list.
+    assert next(s for s in app.selectbox if s.label == "Intervalo").value == "30 minutos"
+
+
 def test_app_has_the_five_tabs(app):
     assert [t.label for t in app.tabs] == ["🔮 Previsão", "🧪 Teste de realidade", "👥 Dimensionamento", "📅 Escala", "🧮 Cenários"]
 
