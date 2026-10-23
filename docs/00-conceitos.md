@@ -29,7 +29,9 @@ ela. O **TimesFM** é diferente: foi treinado antes, pelo Google, com uma enorme
 vários assuntos. Por isso consegue prever uma série que **nunca viu**, sem treinar nada (*zero-shot*).
 Você entrega o histórico e recebe a previsão.
 
-É como um analista experiente que já viu o volume de milhares de operações e reconhece o padrão na sua.
+É como um analista experiente que já viu milhares de gráficos de assuntos variados (visitas a sites, energia,
+vendas...) e reconhece o padrão na sua série, sem conhecer a sua central. Para entender como ele aprendeu e como
+funciona por dentro, sem jargão, veja o [guia 13](13-como-o-timesfm-funciona.md).
 
 ## Previsão pontual e quantis
 

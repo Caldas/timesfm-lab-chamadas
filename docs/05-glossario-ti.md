@@ -26,7 +26,7 @@ aparecem neste laboratório.
 | **CSV** | Arquivo de planilha em texto puro: linhas, com valores separados por vírgula (ou ponto e vírgula). Abre no Excel. |
 | **Streamlit** | A ferramenta que cria a interface web deste projeto. |
 | **Notebook (Jupyter)** | Documento com texto e código em "células" que você roda uma a uma e vê o resultado logo abaixo. Ótimo para estudar. |
-| **Modelo / pesos** | O "cérebro" já treinado do TimesFM: um arquivo grande baixado na primeira execução. |
+| **Modelo / pesos** | O "cérebro" já treinado do TimesFM: um arquivo grande baixado na primeira execução. Veja [como ele funciona](13-como-o-timesfm-funciona.md). |
 | **Hugging Face** | Site onde o modelo está armazenado para download. |
 | **MLX** | Tecnologia da Apple para rodar modelos de IA com eficiência nos chips M1/M2/M3/M4. |
 | **CPU / GPU** | O processador comum / o processador gráfico, bom para cálculos de IA. |

@@ -31,6 +31,7 @@ explicado passo a passo, e há uma interface web para mexer nos dados sem escrev
 | Passo | Guia |
 |---|---|
 | Entender os conceitos | [docs/00-conceitos.md](docs/00-conceitos.md) |
+| Como o TimesFM funciona e foi treinado (sem jargão) | [docs/13-como-o-timesfm-funciona.md](docs/13-como-o-timesfm-funciona.md) |
 | Instalar (escolha seu sistema) | [docs/01-instalar.md](docs/01-instalar.md): [Mac](docs/01-instalar-mac.md) · [Ubuntu](docs/01-instalar-ubuntu.md) · [Windows](docs/01-instalar-windows.md) |
 | Baixar datasets de chamadas | [docs/03-baixar-datasets.md](docs/03-baixar-datasets.md) e [data/README.md](data/README.md) |
 | Usar a interface | [docs/04-usando-a-interface.md](docs/04-usando-a-interface.md) |

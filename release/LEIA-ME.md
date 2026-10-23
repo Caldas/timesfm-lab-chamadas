@@ -53,4 +53,6 @@ uso: `data/README.md`.
 - Os **pesos do TimesFM 3.0 têm licença não comercial**: este laboratório é para estudo.
 - Os datasets não vêm no pacote; cada um tem as suas condições de uso (`data/README.md`).
 
+Quer entender **como o TimesFM funciona e como foi treinado**, em linguagem simples? `docs/13-como-o-timesfm-funciona.md`.
+
 Algo deu errado? `docs/06-problemas-comuns.md`.
